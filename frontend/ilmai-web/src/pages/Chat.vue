@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[calc(100vh-64px)] flex overflow-hidden bg-background relative">
+  <div class="h-screen pt-16 flex overflow-hidden bg-background relative">
     <!-- Lava Lamp Background (Subtle) -->
     <div class="lava-container opacity-30">
       <div class="blob blob-1"></div>
@@ -39,14 +39,70 @@
     <div class="flex-grow flex flex-col bg-transparent overflow-hidden relative z-10">
       <!-- Chat Header (Mobile) -->
       <div class="md:hidden p-4 border-b border-border flex items-center justify-between bg-surface/40 backdrop-blur-xl sticky top-0 z-10">
-        <h2 class="text-main font-bold flex items-center">
-           <svg class="w-5 h-5 mr-2 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path></svg>
-           IlmAI Chat
-        </h2>
+        <div class="flex items-center">
+          <Button size="sm" variant="ghost" @click="isHistoryOpen = true" class="!p-2 mr-2">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+          </Button>
+          <h2 class="text-main font-bold flex items-center">
+             IlmAI Chat
+          </h2>
+        </div>
         <Button size="sm" variant="ghost" @click="chatStore.newChat()" class="!p-2">
            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
         </Button>
       </div>
+
+      <!-- Mobile History Drawer Overlay -->
+      <Transition
+        enter-active-class="transition duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="isHistoryOpen" class="fixed inset-0 z-[100] md:hidden">
+          <!-- Backdrop -->
+          <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="isHistoryOpen = false"></div>
+          
+          <!-- Drawer Content -->
+          <div class="absolute inset-y-0 left-0 w-[280px] bg-background border-r border-border flex flex-col shadow-2xl animate-in slide-in-from-left duration-300">
+            <div class="p-5 border-b border-border flex items-center justify-between bg-surface/50">
+              <h3 class="font-bold text-main tracking-tight italic">Historija razgovora</h3>
+              <button @click="isHistoryOpen = false" class="p-2 text-muted hover:text-main transition-colors rounded-lg hover:bg-surface/80">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+            
+            <div class="p-4 border-b border-border">
+              <Button class="w-full" variant="outline" @click="() => { chatStore.newChat(); isHistoryOpen = false; }">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                {{ $t('chat.newChat') }}
+              </Button>
+            </div>
+
+            <div class="flex-grow overflow-y-auto p-2 space-y-1 custom-scrollbar">
+              <button
+                v-for="session in chatStore.sessions"
+                :key="session.id"
+                @click="() => { chatStore.loadMessages(session.id); isHistoryOpen = false; }"
+                :class="[
+                  'w-full text-left px-3 py-3 rounded-lg text-sm transition-all duration-200',
+                  chatStore.currentSessionId === session.id 
+                    ? 'bg-emerald-500/10 text-emerald-500 font-medium border border-emerald-500/20 shadow-sm' 
+                    : 'text-muted hover:text-main hover:bg-surface/50'
+                ]"
+              >
+                <div class="truncate font-medium">{{ session.title || 'Untitled Chat' }}</div>
+                <div class="text-[10px] text-muted opacity-70 mt-1 flex items-center">
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  {{ new Date(session.updatedAt).toLocaleDateString() }}
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
 
       <!-- Messages -->
       <div ref="messageContainer" class="flex-grow overflow-y-auto p-4 md:p-8 space-y-8 scroll-smooth custom-scrollbar">
@@ -126,14 +182,17 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import { useChatStore } from '@/stores/chat'
 import { useI18n } from 'vue-i18n'
 import Button from '@/components/ui/Button.vue'
 
 const chatStore = useChatStore()
 const { locale } = useI18n()
+const route = useRoute()
 const input = ref('')
 const messageContainer = ref<HTMLElement | null>(null)
+const isHistoryOpen = ref(false)
 
 const handleSend = async () => {
   if (!input.value.trim() || chatStore.sending) return
@@ -155,5 +214,11 @@ watch(() => chatStore.messages.length, () => scrollToBottom())
 
 onMounted(async () => {
   await chatStore.loadSessions()
+  
+  // Handle prompt from query parameter (e.g. from Search page)
+  if (route.query.prompt) {
+    input.value = route.query.prompt as string
+    handleSend()
+  }
 })
 </script>

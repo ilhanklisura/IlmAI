@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-transparent text-main font-sans selection:bg-emerald-500/30">
     <Navbar />
-    <main class="pt-16 pb-12">
+    <main class="">
       <router-view v-slot="{ Component }">
         <transition 
           enter-active-class="transition duration-300 ease-out"
@@ -12,7 +12,7 @@
           leave-to-class="opacity-0 translate-y-4"
           mode="out-in"
         >
-          <component :is="Component" />
+          <component :is="Component" :key="$route.path" />
         </transition>
       </router-view>
     </main>

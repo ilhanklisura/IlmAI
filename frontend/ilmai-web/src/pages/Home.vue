@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[100dvh] flex flex-col relative overflow-hidden bg-background">
+  <div class="min-h-[100dvh] flex flex-col relative bg-background">
     <!-- Lava Lamp Background -->
     <div class="lava-container">
       <div class="blob blob-1"></div>
@@ -8,7 +8,7 @@
     </div>
     
     <!-- Content Wrapper -->
-    <div class="relative z-10 flex-grow flex flex-col items-center justify-center px-4 py-6">
+    <div class="relative z-10 flex-grow flex flex-col items-center px-4 pt-24 pb-24 md:pt-32 md:pb-32">
       <Container class="w-full max-w-6xl flex flex-col items-center">
         
         <!-- Hero Section -->
@@ -128,7 +128,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="relative z-10 py-4 text-center border-t border-border/10 bg-surface/5 backdrop-blur-sm">
+    <footer class="fixed bottom-0 left-0 right-0 z-50 py-6 text-center border-t border-border/10 bg-surface/10 backdrop-blur-xl">
       <p class="text-[10px] font-bold text-muted/40 uppercase tracking-[0.3em]">
         &copy; {{ new Date().getFullYear() }} IlmAI — {{ $t('home.heroSubtitle') }}
       </p>

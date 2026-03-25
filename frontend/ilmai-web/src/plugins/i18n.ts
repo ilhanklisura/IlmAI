@@ -2,7 +2,7 @@ import { createI18n } from 'vue-i18n'
 
 const bs = {
   app: { name: 'IlmAI', subtitle: 'AI Asistent za Islamsko Znanje' },
-  nav: { home: 'Početna', chat: 'Pitaj AI', quran: "Kur'an", hadith: 'Hadis', search: 'Pretraga', settings: 'Postavke', login: 'Prijava', register: 'Registracija', logout: 'Odjava' },
+  nav: { home: 'Početna', chat: 'Pitaj AI', quran: "Kur'an", hadith: 'Hadis', search: 'Pretraga', settings: 'Postavke', login: 'Prijava', register: 'Registracija', logout: 'Odjava', welcome: 'Dobrodošli' },
   home: { 
     welcome: 'Dobrodošli u IlmAI', 
     heroTitle: 'IlmAI —',
@@ -42,7 +42,7 @@ const bs = {
 
 const en = {
   app: { name: 'IlmAI', subtitle: 'AI Islamic Knowledge Assistant' },
-  nav: { home: 'Home', chat: 'Ask AI', quran: 'Quran', hadith: 'Hadith', search: 'Search', settings: 'Settings', login: 'Login', register: 'Register', logout: 'Logout' },
+  nav: { home: 'Home', chat: 'Ask AI', quran: 'Quran', hadith: 'Hadith', search: 'Search', settings: 'Settings', login: 'Login', register: 'Register', logout: 'Logout', welcome: 'Welcome' },
   home: { 
     welcome: 'Welcome to IlmAI', 
     heroTitle: 'IlmAI —',

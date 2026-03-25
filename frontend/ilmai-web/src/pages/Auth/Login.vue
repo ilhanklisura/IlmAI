@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[calc(100vh-64px)] flex items-center justify-center p-4">
+  <div class="min-h-screen flex items-center justify-center p-4 pt-20">
     <div class="absolute inset-0 hero-gradient opacity-10 pointer-events-none"></div>
     
     <div class="w-full max-w-md relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-700">

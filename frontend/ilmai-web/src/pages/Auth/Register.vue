@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[calc(100vh-64px)] flex items-center justify-center p-4 relative overflow-hidden">
+  <div class="min-h-screen flex items-center justify-center p-4 pt-20 relative overflow-hidden">
     <!-- Background Decoration -->
     <div class="absolute inset-0 hero-gradient opacity-10 pointer-events-none"></div>
     
