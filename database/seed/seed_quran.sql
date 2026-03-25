@@ -1,0 +1,3 @@
+-- Placeholder: seed Qur'an data from CSV
+-- Run: psql -U ilmai -d ilmai -f seed_quran.sql
+-- Or use scripts/import_quran.py for full import

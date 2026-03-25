@@ -1,0 +1,3 @@
+-- Placeholder: seed Tafsir data
+-- Run: psql -U ilmai -d ilmai -f seed_tafsir.sql
+-- Or use scripts/import_tafsir.py for full import

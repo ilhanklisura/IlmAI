@@ -1,0 +1,3 @@
+-- Placeholder: seed Hadith data from CSV
+-- Run: psql -U ilmai -d ilmai -f seed_hadith.sql
+-- Or use scripts/import_hadith.py for full import
