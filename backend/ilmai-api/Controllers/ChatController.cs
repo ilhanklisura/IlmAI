@@ -37,4 +37,24 @@ public class ChatController : ControllerBase
         var messages = await _chatService.GetMessagesAsync(GetUserId(), sessionId);
         return Ok(messages);
     }
+
+    [HttpDelete("sessions/{sessionId}")]
+    public async Task<IActionResult> DeleteSession(Guid sessionId)
+    {
+        await _chatService.DeleteSessionAsync(GetUserId(), sessionId);
+        return Ok(new { message = "Session deleted" });
+    }
+
+    [HttpPut("sessions/{id}/title")]
+    public async Task<IActionResult> UpdateTitle(Guid id, [FromBody] UpdateTitleRequest req)
+    {
+        await _chatService.UpdateTitleAsync(id, req.Title);
+        return NoContent();
+    }
+
+    // Requests
+    public class UpdateTitleRequest
+    {
+        public required string Title { get; set; }
+    }
 }

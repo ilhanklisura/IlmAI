@@ -8,4 +8,6 @@ public interface IChatService : IService
     Task<AskResponse> AskAsync(Guid userId, SendMessageRequest request);
     Task<List<ChatSessionResponse>> GetSessionsAsync(Guid userId);
     Task<List<ChatMessageResponse>> GetMessagesAsync(Guid userId, Guid sessionId);
+    Task DeleteSessionAsync(Guid userId, Guid sessionId);
+    Task UpdateTitleAsync(Guid sessionId, string title);
 }

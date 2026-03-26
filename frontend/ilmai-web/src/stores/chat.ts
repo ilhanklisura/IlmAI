@@ -35,7 +35,27 @@ export const useChatStore = defineStore('chat', () => {
     } finally { sending.value = false }
   }
 
+  async function deleteSession(sessionId: string) {
+    await api.chat.deleteSession(sessionId)
+
+    // ako brišeš trenutno otvoren chat → reset
+    if (currentSessionId.value === sessionId) {
+      currentSessionId.value = null
+      messages.value = []
+    }
+
+    // ukloni iz liste (instant UX)
+    sessions.value = sessions.value.filter(s => s.id !== sessionId)
+  }
+
+  async function renameSession(sessionId: string, title: string) {
+    await api.chat.renameSession(sessionId, title)
+
+    const s = sessions.value.find(s => s.id === sessionId)
+    if (s) s.title = title
+  }
+
   function newChat() { currentSessionId.value = null; messages.value = [] }
 
-  return { sessions, currentSessionId, messages, loading, sending, loadSessions, loadMessages, sendMessage, newChat }
+  return { sessions, currentSessionId, messages, loading, sending, loadSessions, loadMessages, sendMessage, deleteSession, renameSession, newChat }
 })

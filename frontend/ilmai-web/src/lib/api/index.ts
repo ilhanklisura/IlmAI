@@ -6,12 +6,24 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   const token = getToken()
   if (token) headers['Authorization'] = `Bearer ${token}`
-  const res = await fetch(`${API_BASE}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined })
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers,
+    body: body ? JSON.stringify(body) : undefined
+  })
+
+  if (res.status === 204) {
+    return null as T
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({ message: res.statusText }))
     throw new Error(err.message || res.statusText)
   }
-  return res.json()
+
+  const text = await res.text()
+  return text ? JSON.parse(text) : ({} as T)
 }
 
 export const api = {
@@ -24,6 +36,9 @@ export const api = {
     send: (data: { sessionId?: string; question: string; language: string }) => request<any>('POST', '/chat/send', data),
     sessions: () => request<any[]>('GET', '/chat/sessions'),
     messages: (sessionId: string) => request<any[]>('GET', `/chat/sessions/${sessionId}/messages`),
+    deleteSession: (sessionId: string) => request<any>('DELETE', `/chat/sessions/${sessionId}`),
+    renameSession: (id: string, title: string) =>
+      request<any>('PUT', `/chat/sessions/${id}/title`, { title })
   },
   quran: {
     search: (query: string, lang = 'bs') => request<any[]>('GET', `/quran/search?query=${encodeURIComponent(query)}&language=${lang}`),

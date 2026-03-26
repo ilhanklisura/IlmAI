@@ -156,6 +156,39 @@ public class ChatService : IChatService
         }).ToList();
     }
 
+    public async Task DeleteSessionAsync(Guid userId, Guid sessionId)
+    {
+        var session = await _context.ChatSessions
+            .Include(s => s.Messages)
+            .FirstOrDefaultAsync(s => s.Id == sessionId && s.UserId == userId);
+
+        if (session == null)
+            throw new InvalidOperationException("Session not found");
+
+        _context.ChatMessages.RemoveRange(session.Messages);
+        _context.ChatSessions.Remove(session);
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateTitleAsync(Guid sessionId, string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Title cannot be empty");
+
+        if (title.Length > 100)
+            title = title.Substring(0, 100);
+
+        var session = await _context.ChatSessions.FindAsync(sessionId);
+
+        if (session == null)
+            throw new Exception("Session not found");
+
+        session.Title = title;
+
+        await _context.SaveChangesAsync();
+    }
+
     // Internal model for AI Server response
     private class AiServerResponse
     {

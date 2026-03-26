@@ -15,23 +15,60 @@
         </Button>
       </div>
       <div class="flex-grow overflow-y-auto p-2 space-y-1 custom-scrollbar">
-        <button
+        <div
           v-for="session in chatStore.sessions"
           :key="session.id"
-          @click="chatStore.loadMessages(session.id)"
-          :class="[
-            'w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
-            chatStore.currentSessionId === session.id 
-              ? 'bg-emerald-500/10 text-emerald-500 font-medium border border-emerald-500/20 shadow-sm' 
-              : 'text-muted hover:text-main hover:bg-surface/50'
-          ]"
+          class="relative group"
         >
-          <div class="truncate font-medium">{{ session.title || 'Untitled Chat' }}</div>
-          <div class="text-[10px] text-muted opacity-70 mt-1 flex items-center">
-            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            {{ new Date(session.updatedAt).toLocaleDateString() }}
-          </div>
-        </button>
+          <button
+            @click="chatStore.loadMessages(session.id)"
+            :class="[
+              'w-full text-left px-3 py-2.5 rounded-lg text-sm transition-all duration-200',
+              chatStore.currentSessionId === session.id 
+                ? 'bg-emerald-500/10 text-emerald-500 font-medium border border-emerald-500/20 shadow-sm' 
+                : 'text-muted hover:text-main hover:bg-surface/50'
+            ]"
+          >
+            <div v-if="editingId === session.id">
+              <input
+                v-model="editingTitle"
+                @blur="saveRename(session.id)"
+                @keydown.enter="saveRename(session.id)"
+                class="w-full bg-transparent outline-none text-sm font-medium"
+                autofocus
+              />
+            </div>
+
+            <div v-else class="truncate font-medium"
+                @dblclick="startRename(session)">
+              {{ session.title || 'Untitled Chat' }}
+            </div>
+
+            <div class="text-[10px] text-muted opacity-70 mt-1 flex items-center">
+              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+                </path>
+              </svg>
+              {{ new Date(session.updatedAt).toLocaleDateString() }}
+            </div>
+          </button>
+
+          <button
+            @click.stop="openDeleteDialog(session.id)"
+            class="absolute right-2 top-1/2 -translate-y-1/2 
+              p-2 rounded-lg 
+              text-red-400 hover:text-red-500 hover:bg-red-500/10 
+              transition-all duration-200"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862
+                a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1
+                7h22M9 3h6a1 1 0 011 1v2H8V4a1 1 0 011-1z" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -93,7 +130,7 @@
                     : 'text-muted hover:text-main hover:bg-surface/50'
                 ]"
               >
-                <div class="truncate font-medium">{{ session.title || 'Untitled Chat' }}</div>
+                <div class="truncate font-medium pr-8">{{ session.title || 'Untitled Chat' }}</div>
                 <div class="text-[10px] text-muted opacity-70 mt-1 flex items-center">
                   <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                   {{ new Date(session.updatedAt).toLocaleDateString() }}
@@ -177,6 +214,48 @@
         <p class="text-center text-[10px] text-muted opacity-60 mt-4 uppercase tracking-widest font-bold">{{ $t('chat.disclaimer') || 'IlmAI može dati netačne informacije. Provjerite izvore.' }}</p>
       </div>
     </div>
+    <Transition
+      enter-active-class="transition duration-200"
+      enter-from-class="opacity-0 scale-95"
+      enter-to-class="opacity-100 scale-100"
+      leave-active-class="transition duration-150"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-95"
+    >
+      <div v-if="showDeleteDialog" class="fixed inset-0 z-[999] flex items-center justify-center">
+
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            @click="showDeleteDialog = false"></div>
+
+        <div class="relative bg-surface border border-border rounded-2xl p-6 w-[90%] max-w-sm shadow-2xl z-10">
+
+          <h3 class="text-lg font-bold text-main mb-2">
+            Obriši chat?
+          </h3>
+
+          <p class="text-sm text-muted mb-6">
+            Ova akcija je trajna i ne može se poništiti.
+          </p>
+
+          <div class="flex justify-end gap-2">
+            <button
+              @click="showDeleteDialog = false"
+              class="px-4 py-2 text-sm rounded-lg bg-surface border border-border hover:bg-surface/70"
+            >
+              Otkaži
+            </button>
+
+            <button
+              @click="confirmDelete"
+              class="px-4 py-2 text-sm rounded-lg bg-red-500 text-white hover:bg-red-600"
+            >
+              Obriši
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -193,6 +272,39 @@ const route = useRoute()
 const input = ref('')
 const messageContainer = ref<HTMLElement | null>(null)
 const isHistoryOpen = ref(false)
+
+const showDeleteDialog = ref(false)
+const sessionToDelete = ref<string | null>(null)
+
+const editingId = ref<string | null>(null)
+const editingTitle = ref('')
+
+const startRename = (session: any) => {
+  editingId.value = session.id
+  editingTitle.value = session.title
+}
+
+const saveRename = async (id: string) => {
+  if (!editingTitle.value.trim()) return
+
+  await chatStore.renameSession(id, editingTitle.value)
+
+  editingId.value = null
+}
+
+const openDeleteDialog = (id: string) => {
+  sessionToDelete.value = id
+  showDeleteDialog.value = true
+}
+
+const confirmDelete = async () => {
+  if (!sessionToDelete.value) return
+
+  await chatStore.deleteSession(sessionToDelete.value)
+
+  showDeleteDialog.value = false
+  sessionToDelete.value = null
+}
 
 const handleSend = async () => {
   if (!input.value.trim() || chatStore.sending) return
