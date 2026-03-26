@@ -26,7 +26,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__Default: "Host=postgres;Database=ilmai;Username=ilmai;Password=${POSTGRES_PASSWORD:-IlmAI_Dev_2026!}"
-      AIServer__Host: "http://ai-server:8080"
+      AppOptions__AIServerHost: "http://ai-server:8080"
     depends_on:
       postgres:
         condition: service_healthy
@@ -41,7 +41,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ConnectionStrings__Default: "Host=postgres;Database=ilmai;Username=ilmai;Password=${POSTGRES_PASSWORD:-IlmAI_Dev_2026!}"
-      OpenAI__ApiKey: ${OPENAI_API_KEY:-}
+      OpenAI__ApiKey: ${OPENAI_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy

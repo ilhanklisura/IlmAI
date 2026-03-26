@@ -27,6 +27,12 @@ public class OpenAIChatProvider : IChatProvider, IService
             temperature = 0.3
         };
         var response = await client.PostAsJsonAsync("chat/completions", request, ct);
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync(ct);
+            Console.WriteLine($"❌ OpenAI ERROR: {response.StatusCode} - {error}");
+            throw new Exception($"OpenAI failed: {error}");
+        }
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
         return json.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString() ?? "";
