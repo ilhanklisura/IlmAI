@@ -43,6 +43,7 @@ venv/
 # =====================
 # Environment / Secrets
 # =====================
+.env
 .env.local
 .env.*.local
 appsettings.Development.json
