@@ -16,6 +16,18 @@ services:
       timeout: 5s
       retries: 5
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: ilmai-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
   backend:
     build:
       context: .

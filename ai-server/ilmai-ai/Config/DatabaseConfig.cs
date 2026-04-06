@@ -11,7 +11,7 @@ public class DatabaseConfig : IConfig
             ?? throw new InvalidOperationException("Missing ConnectionStrings:Default");
         services
             .AddDbContext<AIDataContext>(options =>
-                options.UseNpgsql(connectionString, npgsql => npgsql.UseVector()))
+                options.UseNpgsql(connectionString, npgsql => npgsql.UseVector()).UseSnakeCaseNamingConvention())
             .AddFluentMigratorCore()
             .ConfigureRunner(rb => rb
                 .AddPostgres()
