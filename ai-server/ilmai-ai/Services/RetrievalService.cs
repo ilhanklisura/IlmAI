@@ -8,7 +8,7 @@ public record RetrievedChunk(string DocumentTitle, string Content, string? Start
 
 public interface IRetrievalService : IService
 {
-    Task<List<RetrievedChunk>> RetrieveAsync(Vector queryEmbedding, int topK, double scoreThreshold, CancellationToken ct = default);
+    Task<List<RetrievedChunk>> RetrieveAsync(Vector queryEmbedding, int topK, double scoreThreshold, string language = "bs", CancellationToken ct = default);
 }
 
 public class RetrievalService : IRetrievalService
@@ -16,13 +16,13 @@ public class RetrievalService : IRetrievalService
     private readonly AIDataContext _ctx;
     public RetrievalService(AIDataContext ctx) { _ctx = ctx; }
 
-    public async Task<List<RetrievedChunk>> RetrieveAsync(Vector queryEmbedding, int topK, double scoreThreshold, CancellationToken ct = default)
+    public async Task<List<RetrievedChunk>> RetrieveAsync(Vector queryEmbedding, int topK, double scoreThreshold, string language = "bs", CancellationToken ct = default)
     {
         var results = new List<RetrievedChunk>();
 
         // Search Quran chunks
         var quranResults = await _ctx.QuranChunks
-            .Where(c => c.Embedding != null)
+            .Where(c => c.Embedding != null && c.Language == language)
             .OrderBy(c => c.Embedding!.CosineDistance(queryEmbedding))
             .Take(topK)
             .Select(c => new { c.Content, c.SurahNumber, c.AyahStart, c.AyahEnd,
@@ -35,7 +35,7 @@ public class RetrievalService : IRetrievalService
 
         // Search Hadith chunks
         var hadithResults = await _ctx.HadithChunks
-            .Where(c => c.Embedding != null)
+            .Where(c => c.Embedding != null && c.Language == language)
             .OrderBy(c => c.Embedding!.CosineDistance(queryEmbedding))
             .Take(topK)
             .Select(c => new { c.Content, c.CollectionId, c.HadithNumber,
@@ -48,7 +48,7 @@ public class RetrievalService : IRetrievalService
 
         // Search Tafsir chunks
         var tafsirResults = await _ctx.TafsirChunks
-            .Where(c => c.Embedding != null)
+            .Where(c => c.Embedding != null && c.Language == language)
             .OrderBy(c => c.Embedding!.CosineDistance(queryEmbedding))
             .Take(topK)
             .Select(c => new { c.Content, c.SurahNumber, c.AyahStart, c.AyahEnd,
@@ -62,7 +62,7 @@ public class RetrievalService : IRetrievalService
         // Search general document chunks
         var docResults = await _ctx.DocumentChunks
             .Include(c => c.Document)
-            .Where(c => c.Embedding != null)
+            .Where(c => c.Embedding != null && c.Document.Language == language)
             .OrderBy(c => c.Embedding!.CosineDistance(queryEmbedding))
             .Take(topK)
             .Select(c => new { c.Content, DocumentTitle = c.Document.Title,

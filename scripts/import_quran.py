@@ -1,24 +1,58 @@
-"""IlmAI: Import Qur'an data from CSV into PostgreSQL."""
+"""IlmAI: Import Qur'an data from datasets into PostgreSQL."""
 import os
 import csv
+import json
 import psycopg2
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://ilmai:IlmAI_Dev_2026!@localhost:5432/ilmai")
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "database", "datasets", "quran")
+DATASETS_DIR = os.path.join(os.path.dirname(__file__), "..", "database", "datasets")
+BOSNIAN_CSV = os.path.join(DATASETS_DIR, "bosnian_rwwad_v2.0.4-csv.1.csv")
+ENGLISH_DIR = os.path.join(DATASETS_DIR, "quranjson-master", "source", "translation", "en")
 
 
-def import_quran(language: str, filename: str):
-    filepath = os.path.join(DATA_DIR, filename)
-    if not os.path.exists(filepath):
-        print(f"File not found: {filepath}")
+def import_quran():
+    if not os.path.exists(BOSNIAN_CSV):
+        print(f"File not found: {BOSNIAN_CSV}")
         return
 
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor()
 
-    with open(filepath, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
+    current_surah = None
+    english_translation = {}
+
+    with open(BOSNIAN_CSV, "r", encoding="utf-8") as f:
+        # First 11 lines are headers/comments, let's skip until we hit 'id,sura,aya'
+        for line in f:
+            if line.startswith("id,sura,aya"):
+                break
+                
+        reader = csv.DictReader(f, fieldnames=["id", "sura", "aya", "translation", "footnotes"])
+
         for row in reader:
+            try:
+                sura = int(row["sura"])
+                aya = int(row["aya"])
+            except ValueError:
+                continue
+                
+            text_bs = row.get("translation", "").strip()
+            
+            if sura != current_surah:
+                current_surah = sura
+                # Load english translation
+                en_file = os.path.join(ENGLISH_DIR, f"en_translation_{sura}.json")
+                if os.path.exists(en_file):
+                    with open(en_file, "r", encoding="utf-8") as enf:
+                        en_data = json.load(enf)
+                        english_translation = en_data.get("verse", {})
+                else:
+                    print(f"Warning: English translation file for surah {sura} not found.")
+                    english_translation = {}
+            
+            verse_key = f"verse_{aya}"
+            text_en = english_translation.get(verse_key, "")
+
             cur.execute(
                 """
                 INSERT INTO quran_ayahs (surah_number, ayah_number, text_bosnian, text_english)
@@ -27,20 +61,14 @@ def import_quran(language: str, filename: str):
                     text_bosnian = EXCLUDED.text_bosnian,
                     text_english = EXCLUDED.text_english
                 """,
-                (
-                    int(row.get("surah", 0)),
-                    int(row.get("ayah", 0)),
-                    row.get("text_bs", ""),
-                    row.get("text_en", ""),
-                ),
+                (sura, aya, text_bs, text_en),
             )
 
     conn.commit()
     cur.close()
     conn.close()
-    print(f"Imported Qur'an data from {filename}")
+    print("Imported Qur'an data successfully")
 
 
 if __name__ == "__main__":
-    import_quran("bs", "quran_bs.csv")
-    import_quran("en", "quran_en.csv")
+    import_quran()

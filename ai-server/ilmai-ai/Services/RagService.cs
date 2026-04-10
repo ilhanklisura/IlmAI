@@ -9,8 +9,8 @@ public interface IRagService : IService
 public class RagService : IRagService
 {
     private const int TopK = 10;
-    private const double ScoreThresholdStrong = 0.80;
-    private const double ScoreThresholdWeak = 0.70;
+    private const double ScoreThresholdStrong = 0.55;
+    private const double ScoreThresholdWeak = 0.40;
     private const int MaxContextLength = 12000;
 
     private readonly IEmbeddingService _embedding;
@@ -28,9 +28,10 @@ public class RagService : IRagService
 
     public async Task<RagResponseDto> AskGlobalAsync(string question, string language, CancellationToken ct = default)
     {
+        language = LanguageDetector.Detect(question, language);
         var queryEmbedding = await _embedding.GetEmbeddingAsync(question, ct);
 
-        var sources = await _retrieval.RetrieveAsync(queryEmbedding, TopK, ScoreThresholdWeak, ct);
+        var sources = await _retrieval.RetrieveAsync(queryEmbedding, TopK, ScoreThresholdWeak, language, ct);
 
         if (sources.Count == 0)
         {

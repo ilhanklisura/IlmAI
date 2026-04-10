@@ -160,7 +160,7 @@
               ? 'bg-emerald-500 text-white rounded-tr-sm shadow-lg shadow-emerald-500/10' 
               : 'bg-surface/60 backdrop-blur-md border border-border text-main rounded-tl-sm shadow-sm'
           ]">
-            <div class="whitespace-pre-wrap">{{ msg.content }}</div>
+            <div class="markdown-body whitespace-pre-wrap" v-html="renderMarkdown(msg.content)"></div>
             
             <!-- Sources -->
             <div v-if="msg.sources && msg.sources.length > 0" class="mt-5 pt-4 border-t border-border space-y-3">
@@ -265,6 +265,12 @@ import { useRoute } from 'vue-router'
 import { useChatStore } from '@/stores/chat'
 import { useI18n } from 'vue-i18n'
 import Button from '@/components/ui/Button.vue'
+import { marked } from 'marked'
+
+const renderMarkdown = (text: string) => {
+  if (!text) return ''
+  return marked.parse(text)
+}
 
 const chatStore = useChatStore()
 const { locale } = useI18n()
@@ -334,3 +340,14 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style>
+.markdown-body p { margin-bottom: 0.75rem; }
+.markdown-body strong { font-weight: 700; color: #059669; }
+.dark .markdown-body strong { color: #34d399; }
+.markdown-body em { font-style: italic; }
+.markdown-body ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.75rem; }
+.markdown-body ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.75rem; }
+.markdown-body li { margin-bottom: 0.25rem; }
+.markdown-body h1, .markdown-body h2, .markdown-body h3 { font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; color: #10b981; }
+</style>

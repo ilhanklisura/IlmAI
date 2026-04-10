@@ -10,11 +10,27 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ilmai"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  data-seeder:
+    build:
+      context: .
+      dockerfile: docker/data-seeder.Dockerfile
+    container_name: ilmai-data-seeder
+    environment:
+      DATABASE_URL: "postgresql://ilmai:${POSTGRES_PASSWORD}@postgres:5432/ilmai"
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    volumes:
+      - ./scripts:/app/scripts
+      - ./database:/app/database
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   pgadmin:
     image: dpage/pgadmin4

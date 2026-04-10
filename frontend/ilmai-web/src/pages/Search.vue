@@ -44,8 +44,8 @@
         <Card v-for="(res, idx) in results" :key="idx" class="hover:border-emerald-500/50 transition-all duration-300 group hover:shadow-xl hover:shadow-emerald-500/5 flex flex-col">
           <template #header>
             <div class="flex items-center justify-between">
-               <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">{{ res.source }}</span>
-               <span class="text-[10px] text-muted font-bold opacity-60">{{ res.reference }}</span>
+               <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">{{ res.documentTitle ? res.documentTitle.split(' ')[0] : (res.source || 'IZVOR') }}</span>
+               <span class="text-[10px] text-muted font-bold opacity-60">{{ res.documentTitle || res.reference }}</span>
             </div>
           </template>
           <p class="text-main/90 line-clamp-4 leading-relaxed group-hover:text-main transition-colors flex-grow">{{ res.content }}</p>

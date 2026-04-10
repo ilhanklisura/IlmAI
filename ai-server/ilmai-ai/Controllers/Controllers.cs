@@ -28,7 +28,7 @@ public class SearchController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Search([FromBody] SearchRequest request, CancellationToken ct)
     {
-        var results = await _searchService.SearchAsync(request.Question, request.TopK > 0 ? request.TopK : 10, ct);
+        var results = await _searchService.SearchAsync(request.Question, request.Language, request.TopK > 0 ? request.TopK : 10, ct);
         return Ok(results);
     }
 }
