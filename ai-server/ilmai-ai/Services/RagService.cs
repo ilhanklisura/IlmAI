@@ -32,27 +32,18 @@ public class RagService : IRagService
         var queryEmbedding = await _embedding.GetEmbeddingAsync(question, ct);
 
         var sources = await _retrieval.RetrieveAsync(queryEmbedding, TopK, ScoreThresholdWeak, language, ct);
-
-        if (sources.Count == 0)
-        {
-            _logger.LogInformation("RAG: no chunks found for question");
-            return new RagResponseDto(false, "Na osnovu dostupnih izvora nemam dovoljno informacija.", 0, false,
-                Array.Empty<RagSourceDto>());
-        }
-
-        var topScore = sources.Max(s => s.Score);
+        
+        var topScore = sources.Count > 0 ? sources.Max(s => s.Score) : 0;
         var strongChunks = sources.Where(s => s.Score >= ScoreThresholdStrong).ToList();
 
         _logger.LogInformation("RAG: topScore={TopScore:F3}, strongChunks={Strong}, total={Total}",
             topScore, strongChunks.Count, sources.Count);
 
-        if (topScore < ScoreThresholdWeak)
-            return new RagResponseDto(false, "Na osnovu dostupnih izvora nemam dovoljno informacija.", topScore, false,
-                sources.Take(5).Select(s => new RagSourceDto(s.DocumentTitle, s.Content, s.StartTime, s.EndTime, s.Score)).ToList());
-
         var contextChunks = strongChunks.Count > 0 ? strongChunks : sources.Take(5).ToList();
-        var contextText = string.Join("\n\n---\n\n",
-            contextChunks.Select((s, i) => $"[IZVOR {i + 1}] {s.DocumentTitle}\n{s.Content}"));
+        var contextText = contextChunks.Count > 0 
+            ? string.Join("\n\n---\n\n", contextChunks.Select((s, i) => $"[IZVOR {i + 1}] {s.DocumentTitle}\n{s.Content}"))
+            : ""; // Empty context for greetings/small talk
+            
         if (contextText.Length > MaxContextLength)
             contextText = contextText[..MaxContextLength];
 
