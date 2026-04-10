@@ -44,6 +44,16 @@ const bs = {
       register: 'Registracija'
     }
   },
+  verifyEmail: {
+    title: 'Verifikacija Emaila',
+    subtitle: 'Poslali smo 6-cifreni kod na vaš email',
+    placeholder: 'Unesite kod',
+    button: 'Potvrdi',
+    resend: 'Pošalji ponovo',
+    success: 'Email uspješno verifikovan!',
+    error: 'Neispravan kod. Pokušajte ponovo.',
+    backToLogin: 'Povratak na prijavu'
+  },
   common: { save: 'Spremi', close: 'Zatvori' }
 }
 
@@ -90,6 +100,16 @@ const en = {
       login: 'Login',
       register: 'Register'
     }
+  },
+  verifyEmail: {
+    title: 'Email Verification',
+    subtitle: 'We sent a 6-digit code to your email',
+    placeholder: 'Enter code',
+    button: 'Verify',
+    resend: 'Resend Code',
+    success: 'Email successfully verified!',
+    error: 'Invalid code. Please try again.',
+    backToLogin: 'Back to Login'
   },
   common: { save: 'Save', close: 'Close' }
 }

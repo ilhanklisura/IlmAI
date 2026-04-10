@@ -11,16 +11,22 @@ using IlmAI.Api.Models.Response.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using IlmAI.Api.Services.Interfaces;
 
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
     private readonly AppOptions _options;
+    private readonly IEmailService _emailService;
 
-    public AuthService(AppDbContext context, IOptions<AppOptions> options)
+    public AuthService(
+        AppDbContext context, 
+        IOptions<AppOptions> options,
+        IEmailService emailService)
     {
         _context = context;
         _options = options.Value;
+        _emailService = emailService;
     }
 
     public async Task<TokenResponse> LoginAsync(LoginRequest request)
@@ -60,8 +66,16 @@ public class AuthService : IAuthService
 
         user.Settings = new UserSettings { Language = request.PreferredLanguage };
 
+        // Email Verification Logic
+        var verificationCode = new Random().Next(100000, 999999).ToString();
+        user.EmailVerificationCode = verificationCode;
+        user.IsEmailVerified = false;
+
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
+
+        // "Send" email (Mock or real)
+        await _emailService.SendVerificationEmailAsync(user.Email, verificationCode);
 
         await _context.Entry(user).Collection(u => u.UserRoles).LoadAsync();
         foreach (var ur in user.UserRoles)
@@ -86,6 +100,7 @@ public class AuthService : IAuthService
             FirstName = user.FirstName,
             LastName = user.LastName,
             PreferredLanguage = user.PreferredLanguage,
+            IsEmailVerified = user.IsEmailVerified,
             Roles = user.UserRoles.Select(ur => ur.Role.Name).ToList()
         };
     }
@@ -123,6 +138,7 @@ public class AuthService : IAuthService
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 PreferredLanguage = user.PreferredLanguage,
+                IsEmailVerified = user.IsEmailVerified,
                 Roles = user.UserRoles.Select(ur => ur.Role.Name).ToList()
             }
         };
@@ -143,5 +159,45 @@ public class AuthService : IAuthService
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
         user.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
+    }
+
+    public async Task VerifyEmailAsync(string email, string code)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        
+        if (user == null)
+            throw new InvalidOperationException("User not found");
+
+        if (user.IsEmailVerified)
+            return;
+
+        if (user.EmailVerificationCode != code)
+            throw new InvalidOperationException("Invalid verification code");
+
+        user.IsEmailVerified = true;
+        user.EmailVerificationCode = null;
+        user.UpdatedAt = DateTime.UtcNow;
+        
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task ResendVerificationCodeAsync(string email)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        
+        if (user == null)
+            throw new InvalidOperationException("User not found");
+
+        if (user.IsEmailVerified)
+            throw new InvalidOperationException("Email is already verified");
+
+        // Generate new 6-digit code
+        user.EmailVerificationCode = new Random().Next(100000, 999999).ToString();
+        user.UpdatedAt = DateTime.UtcNow;
+        
+        await _context.SaveChangesAsync();
+
+        // Send email (Mock or real)
+        await _emailService.SendVerificationEmailAsync(user.Email, user.EmailVerificationCode);
     }
 }

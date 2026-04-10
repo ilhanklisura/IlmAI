@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { api } from '@/lib/api'
 
-interface User { id: string; username: string; email: string; firstName?: string; lastName?: string; preferredLanguage: string; roles: string[] }
+interface User { id: string; username: string; email: string; firstName?: string; lastName?: string; preferredLanguage: string; isEmailVerified: boolean; roles: string[] }
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('ilmai_token'))

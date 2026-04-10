@@ -72,4 +72,34 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpPost("verify-email")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest request)
+    {
+        try
+        {
+            await _authService.VerifyEmailAsync(request.Email, request.Code);
+            return Ok(new { message = "Email verified successfully" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPost("resend-code")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResendVerificationCode([FromBody] ResendCodeRequest request)
+    {
+        try
+        {
+            await _authService.ResendVerificationCodeAsync(request.Email);
+            return Ok(new { message = "Verification code resent successfully" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }

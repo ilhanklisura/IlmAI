@@ -32,6 +32,8 @@ export const api = {
     register: (data: any) => request<any>('POST', '/auth/register', data),
     me: () => request<any>('GET', '/auth/me'),
     changePassword: (data: { currentPassword: string; newPassword: string; confirmNewPassword: string }) => request<any>('POST', '/auth/change-password', data),
+    verifyEmail: (data: { email: string; code: string }) => request<any>('POST', '/auth/verify-email', data),
+    resendCode: (email: string) => request<any>('POST', '/auth/resend-code', { email }),
   },
   chat: {
     send: (data: { sessionId?: string; question: string; language: string }) => request<any>('POST', '/chat/send', data),

@@ -87,7 +87,7 @@ const handleRegister = async () => {
   error.value = ''
   try {
     await auth.register(form.value)
-    router.push('/')
+    router.push({ name: 'verify-email', query: { email: form.value.email } })
   } catch (err: any) {
     error.value = err.message || 'Registration failed'
   }

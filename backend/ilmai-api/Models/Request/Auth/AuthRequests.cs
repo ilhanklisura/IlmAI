@@ -22,3 +22,14 @@ public class ChangePasswordRequest
     public string NewPassword { get; set; } = "";
     public string ConfirmNewPassword { get; set; } = "";
 }
+
+public class VerifyEmailRequest
+{
+    public string Email { get; set; } = "";
+    public string Code { get; set; } = "";
+}
+
+public class ResendCodeRequest
+{
+    public string Email { get; set; } = "";
+}
