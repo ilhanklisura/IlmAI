@@ -31,6 +31,7 @@ export const api = {
     login: (data: { username: string; password: string }) => request<any>('POST', '/auth/login', data),
     register: (data: any) => request<any>('POST', '/auth/register', data),
     me: () => request<any>('GET', '/auth/me'),
+    changePassword: (data: { currentPassword: string; newPassword: string; confirmNewPassword: string }) => request<any>('POST', '/auth/change-password', data),
   },
   chat: {
     send: (data: { sessionId?: string; question: string; language: string }) => request<any>('POST', '/chat/send', data),

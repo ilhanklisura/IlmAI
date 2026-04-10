@@ -28,14 +28,21 @@ const bs = {
     login: 'Prijavi se', register: 'Registruj se', noAccount: 'Nemate račun?', hasAccount: 'Već imate račun?',
     firstNamePlaceholder: 'Ime', lastNamePlaceholder: 'Prezime'
   },
-  settings: { title: 'Postavke', theme: 'Tema', language: 'Jezik', notifications: 'Notifikacije', dark: 'Tamna', light: 'Svijetla', save: 'Spremi' },
+  settings: { title: 'Postavke', theme: 'Tema', language: 'Jezik', notifications: 'Notifikacije', dark: 'Tamna', light: 'Svijetla', save: 'Spremi', changePassword: 'Promijeni lozinku', currentPassword: 'Trenutna lozinka', newPassword: 'Nova lozinka', confirmPassword: 'Potvrdi novu lozinku', passwordChanged: 'Lozinka uspješno promijenjena!', passwordChangeBtn: 'Promijeni lozinku' },
   search: { 
     title: 'Pretraga', 
     placeholder: 'Pretražite islamske izvore...', 
     results: 'Rezultati', 
     noResults: 'Nema rezultata.',
     subtitle: 'Pretražujte baze podataka islamskih izvora (Kur\'an, Hadis, Tefsir)',
-    button: 'Pretraži'
+    button: 'Pretraži',
+    buttonAskAI: 'Pitaj AI',
+    authModal: {
+      title: 'Niste prijavljeni!',
+      description: 'Prijavite se ili kreirajte nalog kako biste otključali sve mogućnosti IlmAI Chat asistenta.',
+      login: 'Prijava',
+      register: 'Registracija'
+    }
   },
   common: { save: 'Spremi', close: 'Zatvori' }
 }
@@ -68,14 +75,21 @@ const en = {
     login: 'Login', register: 'Register', noAccount: "Don't have an account?", hasAccount: 'Already have an account?',
     firstNamePlaceholder: 'First Name', lastNamePlaceholder: 'Last Name'
   },
-  settings: { title: 'Settings', theme: 'Theme', language: 'Language', notifications: 'Notifications', dark: 'Dark', light: 'Light', save: 'Save' },
+  settings: { title: 'Settings', theme: 'Theme', language: 'Language', notifications: 'Notifications', dark: 'Dark', light: 'Light', save: 'Save', changePassword: 'Change Password', currentPassword: 'Current Password', newPassword: 'New Password', confirmPassword: 'Confirm New Password', passwordChanged: 'Password changed successfully!', passwordChangeBtn: 'Change Password' },
   search: { 
     title: 'Search', 
     placeholder: 'Search Islamic sources...', 
     results: 'Results', 
     noResults: 'No results found.',
     subtitle: 'Search through Islamic source databases (Quran, Hadith, Tafsir)',
-    button: 'Search'
+    button: 'Search',
+    buttonAskAI: 'Ask AI',
+    authModal: {
+      title: 'Not Signed In!',
+      description: 'Log in or create an account to unlock the full power of the IlmAI Chat assistant.',
+      login: 'Login',
+      register: 'Register'
+    }
   },
   common: { save: 'Save', close: 'Close' }
 }

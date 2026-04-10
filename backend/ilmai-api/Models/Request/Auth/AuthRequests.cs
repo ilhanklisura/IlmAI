@@ -15,3 +15,10 @@ public class RegisterRequest
     public string? LastName { get; set; }
     public string PreferredLanguage { get; set; } = "bs";
 }
+
+public class ChangePasswordRequest
+{
+    public string CurrentPassword { get; set; } = "";
+    public string NewPassword { get; set; } = "";
+    public string ConfirmNewPassword { get; set; } = "";
+}

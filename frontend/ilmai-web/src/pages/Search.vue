@@ -12,7 +12,8 @@
         <h1 class="text-4xl font-extrabold text-main tracking-tight animate-in fade-in slide-in-from-top-4 duration-500">{{ $t('search.title') }}</h1>
         <p class="text-muted font-medium opacity-80">{{ $t('search.subtitle') || 'Pretražujte baze podataka islamskih izvora (Kur\'an, Hadis, Tefsir)' }}</p>
         
-<div class="relative mt-6 group w-full max-w-sm sm:max-w-3xl md:max-w-5xl lg:max-w-7xl xl:max-w-[1400px] mx-auto transition-transform duration-300 focus-within:scale-[1.01]">          <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-muted group-focus-within:text-emerald-500 transition-colors">
+        <div class="relative mt-6 group w-full max-w-sm sm:max-w-3xl md:max-w-5xl lg:max-w-7xl xl:max-w-[1400px] mx-auto transition-transform duration-300 focus-within:scale-[1.01]">
+          <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-muted group-focus-within:text-emerald-500 transition-colors">
             <svg class="w-6 h-6" width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </div>
           <input
@@ -56,11 +57,11 @@
              </div>
              
              <button 
-               @click="$router.push({ name: 'chat', query: { prompt: res.content } })"
+               @click="handleAskAI(res.content)"
                class="flex items-center justify-center space-x-2 py-2.5 px-6 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-[11px] font-bold text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all duration-300 uppercase tracking-wider w-full sm:w-auto"
              >
-               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-               <span>Pitaj AI</span>
+               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z"></path></svg>
+               <span>{{ $t('search.buttonAskAI') || 'Pitaj AI' }}</span>
              </button>
           </div>
         </Card>
@@ -72,9 +73,34 @@
         </div>
         <p class="text-muted text-lg font-medium">{{ $t('search.noResults') }}</p>
       </div>
-      
     </Container>
     
+    <!-- Auth Modal -->
+    <Modal :show="showAuthModal" @close="showAuthModal = false">
+      <div class="space-y-6">
+        <div class="w-20 h-20 bg-emerald-500/10 rounded-[2rem] flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform duration-500">
+          <svg class="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        </div>
+        
+        <div class="space-y-2">
+          <h3 class="text-2xl font-bold text-white tracking-tight">{{ $t('search.authModal.title') }}</h3>
+          <p class="text-muted leading-relaxed max-w-xs mx-auto text-sm">{{ $t('search.authModal.description') }}</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3 pt-4">
+          <Button class="w-full !rounded-2xl h-12 shadow-lg shadow-emerald-500/10" @click="$router.push('/login')">
+            {{ $t('search.authModal.login') }}
+          </Button>
+          <button 
+            @click="$router.push('/register')"
+            class="w-full h-12 rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 text-white font-bold transition-all"
+          >
+            {{ $t('search.authModal.register') }}
+          </button>
+        </div>
+      </div>
+    </Modal>
+
     <!-- Footer -->
     <footer class="mt-auto py-8 text-center border-t border-border/10 bg-surface/5 backdrop-blur-xl relative z-10 transition-all duration-500">
       <p class="text-[10px] font-bold text-muted/40 uppercase tracking-[0.3em]">
@@ -86,17 +112,24 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { api } from '@/lib/api'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
 import Container from '@/components/layout/Container.vue'
 import Card from '@/components/ui/Card.vue'
 import Button from '@/components/ui/Button.vue'
+import Modal from '@/components/ui/Modal.vue'
 
+const router = useRouter()
 const { locale } = useI18n()
+const authStore = useAuthStore()
+
 const query = ref('')
 const loading = ref(false)
 const results = ref<any[]>([])
 const searched = ref(false)
+const showAuthModal = ref(false)
 
 const handleSearch = async () => {
   if (!query.value.trim()) return
@@ -109,5 +142,13 @@ const handleSearch = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const handleAskAI = (content: string) => {
+  if (!authStore.isAuthenticated) {
+    showAuthModal.value = true
+    return
+  }
+  router.push({ name: 'chat', query: { prompt: content } })
 }
 </script>
