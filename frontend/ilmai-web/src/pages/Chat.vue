@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen pt-16 flex overflow-hidden bg-background relative">
+  <div class="h-[calc(100vh-64px)] flex overflow-hidden bg-background relative">
     <!-- Lava Lamp Background (Subtle) -->
     <div class="lava-container opacity-30">
       <div class="blob blob-1"></div>

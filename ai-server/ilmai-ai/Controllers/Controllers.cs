@@ -35,6 +35,34 @@ public class SearchController : ControllerBase
 
 [ApiController]
 [Route("api/[controller]")]
+public class TitleController : ControllerBase
+{
+    private readonly IChatCompletionService _chat;
+    private readonly IPromptBuilderService _promptBuilder;
+    public TitleController(IChatCompletionService chat, IPromptBuilderService promptBuilder) 
+    { 
+        _chat = chat; _promptBuilder = promptBuilder; 
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> GenerateTitle([FromBody] TitleRequest request, CancellationToken ct)
+    {
+        var prompt = _promptBuilder.BuildTitlePrompt(request.Question, request.Language);
+        var title = await _chat.CompleteAsync(prompt, ct);
+        // Clean up the title (remove quotes if any)
+        title = title.Trim('\"', '\'', ' ', '\n', '\r');
+        return Ok(new { title });
+    }
+}
+
+public class TitleRequest
+{
+    public string Question { get; set; } = "";
+    public string Language { get; set; } = "bs";
+}
+
+[ApiController]
+[Route("api/[controller]")]
 public class HealthController : ControllerBase
 {
     [HttpGet]

@@ -12,10 +12,48 @@ public class SeedService
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<SeedService>>();
 
-        // Check if admin already exists
-        if (await context.Users.AnyAsync(u => u.Username == "admin"))
+        // Ensure database table for logs exists (raw SQL to avoid migration warnings)
+        logger.LogInformation("Seed: Ensuring logs table exists...");
+        await context.Database.ExecuteSqlRawAsync(@"
+            CREATE TABLE IF NOT EXISTS system_logs (
+                id UUID PRIMARY KEY,
+                level VARCHAR(20) NOT NULL,
+                message TEXT NOT NULL,
+                source TEXT,
+                exception TEXT,
+                user_id TEXT,
+                created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_system_logs_level ON system_logs (level);
+            CREATE INDEX IF NOT EXISTS idx_system_logs_created_at ON system_logs (created_at);
+        ");
+
+        // Seed initial logs if empty
+        if (!await context.SystemLogs.AnyAsync())
         {
-            logger.LogInformation("Seed: Users already seeded, skipping.");
+            context.SystemLogs.AddRange(new List<SystemLog>
+            {
+                new SystemLog { Level = "Info", Message = "Sistem uspješno pokrenut.", Source = "System" },
+                new SystemLog { Level = "Info", Message = "Admin panel konfigurisan.", Source = "AdminUI" },
+                new SystemLog { Level = "Warning", Message = "Provjera verifikacije korisnika u toku...", Source = "AuthService" }
+            });
+            await context.SaveChangesAsync();
+        }
+
+        // Check if admin already exists
+        var existingAdmin = await context.Users.FirstOrDefaultAsync(u => u.Username == "admin");
+        if (existingAdmin != null)
+        {
+            if (!existingAdmin.IsEmailVerified)
+            {
+                existingAdmin.IsEmailVerified = true;
+                await context.SaveChangesAsync();
+                logger.LogInformation("Seed: Existing admin was not verified, marking as verified now.");
+            }
+            else
+            {
+                logger.LogInformation("Seed: Admin already exists and is verified.");
+            }
             return;
         }
 
@@ -38,7 +76,8 @@ public class SeedService
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
             FirstName = "Admin",
             LastName = "IlmAI",
-            PreferredLanguage = "bs"
+            PreferredLanguage = "bs",
+            IsEmailVerified = true
         };
         admin.UserRoles.Add(new UserRole { Role = adminRole });
         admin.UserRoles.Add(new UserRole { Role = userRole });
@@ -53,7 +92,8 @@ public class SeedService
             PasswordHash = BCrypt.Net.BCrypt.HashPassword("User123!"),
             FirstName = "Test",
             LastName = "Korisnik",
-            PreferredLanguage = "bs"
+            PreferredLanguage = "bs",
+            IsEmailVerified = true
         };
         testUser.UserRoles.Add(new UserRole { Role = userRole });
         testUser.Settings = new UserSettings { Language = "bs", Theme = "dark" };

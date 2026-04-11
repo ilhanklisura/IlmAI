@@ -33,10 +33,11 @@ public class ChatService : IChatService
         }
         else
         {
+            var title = await GetAiGeneratedTitleAsync(request.Question, request.Language);
             session = new ChatSession
             {
                 UserId = userId,
-                Title = request.Question.Length > 100 ? request.Question[..100] + "..." : request.Question
+                Title = title
             };
             _context.ChatSessions.Add(session);
             await _context.SaveChangesAsync();
@@ -187,6 +188,34 @@ public class ChatService : IChatService
         session.Title = title;
 
         await _context.SaveChangesAsync();
+    }
+
+    private async Task<string> GetAiGeneratedTitleAsync(string question, string language)
+    {
+        try
+        {
+            var client = _httpClientFactory.CreateClient("AIServer");
+            var titleRequest = new { question, language };
+            
+            // Short timeout for title generation to avoid blocking the main chat
+            var response = await client.PostAsJsonAsync("/api/title", titleRequest);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<JsonElement>();
+                if (result.TryGetProperty("title", out var titleProp))
+                {
+                    return titleProp.GetString() ?? question[..Math.Min(question.Length, 50)];
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to get AI generated title, falling back to truncated question");
+        }
+
+        // Fallback: Truncate question
+        return question.Length > 50 ? question[..50] + "..." : question;
     }
 
     // Internal model for AI Server response

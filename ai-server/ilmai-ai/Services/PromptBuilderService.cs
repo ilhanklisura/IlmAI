@@ -1,7 +1,23 @@
 namespace IlmAI.AI.Services;
-public interface IPromptBuilderService : IService { string BuildRagPrompt(string question, string context, string language); }
+
+public interface IPromptBuilderService : IService 
+{ 
+    string BuildRagPrompt(string question, string context, string language); 
+    string BuildTitlePrompt(string question, string language);
+}
 public class PromptBuilderService : IPromptBuilderService
 {
+    public string BuildTitlePrompt(string question, string language)
+    {
+        var lang = language == "bs" ? "bosanskom" : "English";
+        return $"""
+            Summarize the following question into a very short, concise, and catchy title of maximum 4 words.
+            Respond ONLY with the title text.
+            Language: {lang}
+            Question: {question}
+            """;
+    }
+
     public string BuildRagPrompt(string question, string context, string language)
     {
         var langInstruction = language == "bs"

@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
     public DbSet<FavoriteItem> FavoriteItems => Set<FavoriteItem>();
     public DbSet<SearchHistory> SearchHistory => Set<SearchHistory>();
+    public DbSet<SystemLog> SystemLogs => Set<SystemLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -85,6 +86,15 @@ public class AppDbContext : DbContext
             e.ToTable("search_history");
             e.HasKey(h => h.Id);
             e.HasOne(h => h.User).WithMany().HasForeignKey(h => h.UserId);
+        });
+
+        // SystemLog
+        modelBuilder.Entity<SystemLog>(e =>
+        {
+            e.ToTable("system_logs");
+            e.HasKey(l => l.Id);
+            e.HasIndex(l => l.Level);
+            e.HasIndex(l => l.CreatedAt);
         });
     }
 }

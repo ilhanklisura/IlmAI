@@ -1,4 +1,11 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5030/api'
+const getEnvVar = (val: any, fallback: string) => {
+  if (!val || val === 'undefined' || val === 'null') return fallback
+  return val
+}
+
+const API_URL = getEnvVar(import.meta.env.VITE_API_URL, 'http://localhost:5030')
+const API_BASE = getEnvVar(import.meta.env.VITE_API_BASE, `${API_URL}/api`)
+
 
 function getToken(): string | null { return localStorage.getItem('ilmai_token') }
 
@@ -34,6 +41,18 @@ export const api = {
     changePassword: (data: { currentPassword: string; newPassword: string; confirmNewPassword: string }) => request<any>('POST', '/auth/change-password', data),
     verifyEmail: (data: { email: string; code: string }) => request<any>('POST', '/auth/verify-email', data),
     resendCode: (email: string) => request<any>('POST', '/auth/resend-code', { email }),
+    logout: () => request<any>('POST', '/auth/logout'),
+  },
+  admin: {
+    getStats: () => request<any>('GET', '/admin/stats'),
+    getUsers: () => request<any[]>('GET', '/admin/users'),
+    getAnalytics: () => request<any>('GET', '/admin/analytics'),
+    getActivityAnalytics: () => request<any>('GET', '/admin/activity-analytics'),
+    getLogs: (level?: string) => request<any[]>('GET', `/admin/logs${level ? '?level=' + level : ''}`),
+    exportLogsUrl: (format: string) => `${API_URL}/api/admin/logs/export/${format}`,
+    toggleUser: (id: string) => request<any>('PATCH', `/admin/users/${id}/toggle-active`),
+    resetPassword: (id: string) => request<any>('POST', `/admin/users/${id}/reset-password`),
+    updateUserRole: (id: string, roleName: string) => request<any>('PATCH', `/admin/users/${id}/role`, { roleName }),
   },
   chat: {
     send: (data: { sessionId?: string; question: string; language: string }) => request<any>('POST', '/chat/send', data),

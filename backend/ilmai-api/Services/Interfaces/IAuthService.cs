@@ -11,4 +11,5 @@ public interface IAuthService : IService
     Task ChangePasswordAsync(Guid userId, ChangePasswordRequest request);
     Task VerifyEmailAsync(string email, string code);
     Task ResendVerificationCodeAsync(string email);
+    Task LogoutAsync(Guid userId);
 }

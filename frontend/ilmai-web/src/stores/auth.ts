@@ -37,10 +37,16 @@ export const useAuthStore = defineStore('auth', () => {
     try { user.value = await api.auth.me() } catch { logout() }
   }
 
-  function logout() {
-    token.value = null
-    user.value = null
-    localStorage.removeItem('ilmai_token')
+  async function logout() {
+    try {
+      if (token.value) await api.auth.logout()
+    } catch (err) {
+      console.error('Logout API failed:', err)
+    } finally {
+      token.value = null
+      user.value = null
+      localStorage.removeItem('ilmai_token')
+    }
   }
 
   return { token, user, loading, isAuthenticated, isAdmin, login, register, fetchUser, logout }

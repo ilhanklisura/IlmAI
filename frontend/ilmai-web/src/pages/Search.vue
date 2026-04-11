@@ -102,7 +102,7 @@
     </Modal>
 
     <!-- Footer -->
-    <footer class="mt-auto py-8 text-center border-t border-border/10 bg-surface/5 backdrop-blur-xl relative z-10 transition-all duration-500">
+    <footer class="mt-auto py-8 text-center border-t border-border/10 bg-surface/10 backdrop-blur-xl relative z-10 transition-all duration-500">
       <p class="text-[10px] font-bold text-muted/40 uppercase tracking-[0.3em]">
         &copy; {{ new Date().getFullYear() }} IlmAI — {{ $t('home.heroSubtitle') }}
       </p>

@@ -1,5 +1,8 @@
 namespace IlmAI.Api.Config;
 
+using IlmAI.Api.Middleware;
+using Microsoft.AspNetCore.Builder;
+
 public class MvcConfig : IConfig
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
@@ -29,6 +32,7 @@ public class MvcConfig : IConfig
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseMiddleware<UserPresenceMiddleware>();
 
         if (app is WebApplication webApp)
         {

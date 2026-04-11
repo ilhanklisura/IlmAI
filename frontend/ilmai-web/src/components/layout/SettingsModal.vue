@@ -28,6 +28,22 @@
           </div>
           
           <div class="p-8 space-y-8 overflow-y-auto">
+            <!-- Admin Section -->
+            <div v-if="auth.isAdmin" class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase tracking-widest text-emerald-500">{{ $t('admin.nav.administration') }}</span>
+                <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+              </div>
+              <router-link 
+                to="/admin" 
+                @click="close"
+                class="flex items-center justify-center space-x-2 w-full py-3 bg-emerald-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-500/20 hover:bg-emerald-600 transition-all active:scale-95"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002 2zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                <span>{{ $t('admin.nav.openDashboard') }}</span>
+              </router-link>
+            </div>
+
             <!-- Theme Setting -->
             <div class="space-y-4">
               <label class="block text-xs font-bold uppercase tracking-widest" :class="[theme === 'light' ? 'text-slate-500' : 'text-slate-400']">{{ $t('settings.theme') }}</label>
@@ -37,14 +53,14 @@
                   :class="['flex flex-col items-center justify-center space-y-2 p-5 rounded-2xl border transition-all duration-300', theme === 'dark' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500' : 'bg-slate-500/5 border-transparent text-slate-400 hover:border-slate-300']"
                 >
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                  <span class="font-semibold text-sm">Dark</span>
+                  <span class="font-semibold text-sm">{{ $t('settings.dark') }}</span>
                 </button>
                 <button 
                   @click="setTheme('light')"
                   :class="['flex flex-col items-center justify-center space-y-2 p-5 rounded-2xl border transition-all duration-300', theme === 'light' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-500' : 'bg-slate-500/5 border-transparent text-slate-400 hover:border-slate-500']"
                 >
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L5.657 5.657"></path></svg>
-                  <span class="font-semibold text-sm">Light</span>
+                  <span class="font-semibold text-sm">{{ $t('settings.light') }}</span>
                 </button>
               </div>
             </div>

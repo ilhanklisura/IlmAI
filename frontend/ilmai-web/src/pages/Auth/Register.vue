@@ -35,9 +35,38 @@
             <Input v-model="form.email" type="email" required />
           </div>
 
-          <div class="space-y-2">
-            <label class="text-sm font-semibold text-muted tracking-wide ml-1 uppercase text-[11px]">{{ $t('auth.password') }}</label>
-            <Input v-model="form.password" type="password" required />
+          <div class="space-y-4">
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-muted tracking-wide ml-1 uppercase text-[11px]">{{ $t('auth.password') }}</label>
+              <Input v-slot="{ focus }" v-model="form.password" type="password" required />
+              
+              <!-- Password Strength Indicator -->
+              <div v-if="form.password" class="space-y-2 px-1">
+                <div class="flex gap-1 h-1">
+                  <div 
+                    v-for="i in 3" :key="i"
+                    class="flex-1 rounded-full transition-all duration-500"
+                    :class="[
+                      strength >= i 
+                        ? (strength === 1 ? 'bg-red-500' : strength === 2 ? 'bg-amber-500' : 'bg-emerald-500')
+                        : 'bg-border/30'
+                    ]"
+                  ></div>
+                </div>
+                <div class="flex justify-between items-center text-[10px] uppercase tracking-widest font-black">
+                  <span :class="strength === 1 ? 'text-red-500' : strength === 2 ? 'text-amber-500' : 'text-emerald-500'">
+                    {{ strength === 1 ? 'Slaba' : strength === 2 ? 'Srednja' : 'Jaka' }} Šifra
+                  </span>
+                  <span class="text-muted/60" v-if="form.password.length < 6">Min. 6 znakova</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-semibold text-muted tracking-wide ml-1 uppercase text-[11px]">Potvrdi Šifru</label>
+              <Input v-model="form.passwordConfirm" type="password" required />
+              <p v-if="passwordsMismatch" class="text-[10px] text-red-500 font-bold uppercase tracking-wider ml-1">Šifre se ne podudaraju</p>
+            </div>
           </div>
 
           <div v-if="error" class="text-red-500 text-sm bg-red-500/10 border border-red-500/20 p-4 rounded-xl flex items-start space-x-3">
@@ -45,7 +74,13 @@
              <span>{{ error }}</span>
           </div>
 
-          <Button type="submit" size="lg" class="w-full !rounded-2xl shadow-lg shadow-emerald-500/20" :loading="auth.loading">
+          <Button 
+            type="submit" 
+            size="lg" 
+            class="w-full !rounded-2xl shadow-lg shadow-emerald-500/20" 
+            :loading="auth.loading"
+            :disabled="passwordsMismatch || form.password.length < 6"
+          >
             {{ $t('auth.register') }}
           </Button>
 
@@ -64,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Card from '@/components/ui/Card.vue'
@@ -79,8 +114,25 @@ const form = ref({
   username: '',
   email: '',
   password: '',
+  passwordConfirm: '',
   firstName: '',
   lastName: ''
+})
+
+const strength = computed(() => {
+  const p = form.value.password
+  if (!p) return 0
+  if (p.length < 6) return 1
+  
+  let score = 1
+  if (p.length >= 8) score++
+  if (/[0-9]/.test(p) && /[^A-Za-z0-9]/.test(p)) score++
+  
+  return Math.min(score, 3)
+})
+
+const passwordsMismatch = computed(() => {
+  return form.value.passwordConfirm && form.value.password !== form.value.passwordConfirm
 })
 
 const handleRegister = async () => {

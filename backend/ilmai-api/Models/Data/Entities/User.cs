@@ -13,6 +13,7 @@ public class User
     public bool IsDeleted { get; set; } = false;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? LastActiveAt { get; set; }
 
     // Email Verification
     public bool IsEmailVerified { get; set; } = false;

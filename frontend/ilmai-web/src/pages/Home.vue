@@ -128,7 +128,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="fixed bottom-0 left-0 right-0 z-50 py-6 text-center border-t border-border/10 bg-surface/10 backdrop-blur-xl">
+    <footer class="mt-auto py-8 text-center border-t border-border/10 bg-surface/10 backdrop-blur-xl relative z-10">
       <p class="text-[10px] font-bold text-muted/40 uppercase tracking-[0.3em]">
         &copy; {{ new Date().getFullYear() }} IlmAI — {{ $t('home.heroSubtitle') }}
       </p>

@@ -71,6 +71,14 @@ public class AuthService : IAuthService
         user.EmailVerificationCode = verificationCode;
         user.IsEmailVerified = false;
 
+        _context.SystemLogs.Add(new SystemLog
+        {
+            Level = "Info",
+            Message = $"[Verification] Generated code for {user.Email}: {verificationCode}",
+            Source = "AuthService",
+            UserId = user.Id.ToString()
+        });
+
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
@@ -194,10 +202,28 @@ public class AuthService : IAuthService
         // Generate new 6-digit code
         user.EmailVerificationCode = new Random().Next(100000, 999999).ToString();
         user.UpdatedAt = DateTime.UtcNow;
+
+        _context.SystemLogs.Add(new SystemLog
+        {
+            Level = "Info",
+            Message = $"[Verification] New code requested for {user.Email}: {user.EmailVerificationCode}",
+            Source = "AuthService",
+            UserId = user.Id.ToString()
+        });
         
         await _context.SaveChangesAsync();
 
         // Send email (Mock or real)
         await _emailService.SendVerificationEmailAsync(user.Email, user.EmailVerificationCode);
+    }
+
+    public async Task LogoutAsync(Guid userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user != null)
+        {
+            user.LastActiveAt = null;
+            await _context.SaveChangesAsync();
+        }
     }
 }

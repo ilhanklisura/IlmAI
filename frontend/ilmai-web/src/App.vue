@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-transparent text-main font-sans selection:bg-emerald-500/30">
-    <Navbar />
-    <main class="">
+    <Navbar v-if="!isAdminRoute" />
+    <main :class="{ 'pt-16': !isAdminRoute, 'pt-0': isAdminRoute }">
       <router-view v-slot="{ Component }">
         <transition 
           enter-active-class="transition duration-300 ease-out"
@@ -18,16 +18,22 @@
     </main>
     
     <!-- Toast/Notification placeholder -->
+    <Toast />
     <div id="notifications" class="fixed bottom-4 right-4 z-[100] space-y-2"></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import Navbar from '@/components/layout/Navbar.vue'
+import Toast from '@/components/ui/Toast.vue'
 
 const auth = useAuthStore()
+const route = useRoute()
+
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 
 onMounted(async () => {
   if (auth.token) {
