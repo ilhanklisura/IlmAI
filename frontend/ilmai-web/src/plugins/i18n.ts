@@ -256,9 +256,11 @@ const en = {
   }
 }
 
+const savedLocale = localStorage.getItem('user-locale') || 'bs'
+
 export default createI18n({
   legacy: false,
-  locale: 'bs',
+  locale: savedLocale,
   fallbackLocale: 'en',
   messages: { bs, en }
 })
