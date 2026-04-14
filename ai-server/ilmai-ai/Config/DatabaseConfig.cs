@@ -20,6 +20,29 @@ public class DatabaseConfig : IConfig
     }
     public void ConfigureApp(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration config)
     {
-        // Migrations are handled by the backend API service
+        // Ensure vector extension exists at startup
+        using var scope = app.ApplicationServices.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AIDataContext>();
+        try 
+        {
+            context.Database.OpenConnection();
+            using var command = context.Database.GetDbConnection().CreateCommand();
+            command.CommandText = "CREATE EXTENSION IF NOT EXISTS vector;";
+            command.ExecuteNonQuery();
+            
+            // Reload types to ensure Npgsql recognizes 'vector' if it was just created
+            if (context.Database.GetDbConnection() is Npgsql.NpgsqlConnection npgsqlConn)
+            {
+                npgsqlConn.ReloadTypes();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Warning: Could not ensure vector extension: {ex.Message}");
+        }
+        finally
+        {
+            context.Database.CloseConnection();
+        }
     }
 }

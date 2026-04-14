@@ -7,10 +7,15 @@ until pg_isready -d "$DATABASE_URL"; do
 done
 echo "PostgreSQL is ready."
 
-# Check if tables exist, or seed data. Postgres initdb handles the schema.
-# Data seeder will insert if data is missing.
+# 1. Apply schema migrations if they haven't been applied by Postgres init
+echo "Ensuring database schema is up to date..."
+for f in /app/database/migrations/*.sql; do
+    echo "Applying migration: $f"
+    psql "$DATABASE_URL" -f "$f" || echo "Warning: Migration $f failed, continuing..."
+done
 
 # Check if quran_ayahs has data
+# We check this after applying schema to avoid "relation does not exist" errors
 ROW_COUNT=$(psql "$DATABASE_URL" -t -c "SELECT count(*) FROM quran_ayahs;")
 ROW_COUNT=$(echo $ROW_COUNT | xargs)
 
