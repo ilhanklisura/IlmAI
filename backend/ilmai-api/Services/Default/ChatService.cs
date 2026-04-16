@@ -43,7 +43,24 @@ public class ChatService : IChatService
             await _context.SaveChangesAsync();
         }
 
-        // Save user message
+        // Extract past chat history (last 5 messages)
+        var historyOptions = new List<object>();
+        if (request.SessionId.HasValue)
+        {
+            var priorMessages = await _context.ChatMessages
+                .Where(m => m.SessionId == session.Id)
+                .OrderByDescending(m => m.CreatedAt)
+                .Take(5)
+                .ToListAsync();
+
+            historyOptions = priorMessages
+                .OrderBy(m => m.CreatedAt)
+                .Select(m => new { role = m.Role, content = m.Content })
+                .Cast<object>()
+                .ToList();
+        }
+
+        // Save user message (Done after history extraction to avoid sending duplicate question)
         var userMessage = new ChatMessage
         {
             SessionId = session.Id,
@@ -57,7 +74,7 @@ public class ChatService : IChatService
         try
         {
             var client = _httpClientFactory.CreateClient("AIServer");
-            var aiRequest = new { question = request.Question, language = request.Language };
+            var aiRequest = new { question = request.Question, language = request.Language, history = historyOptions };
             var response = await client.PostAsJsonAsync("/api/rag/global", aiRequest);
 
             if (response.IsSuccessStatusCode)

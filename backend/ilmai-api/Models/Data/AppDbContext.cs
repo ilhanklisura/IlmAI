@@ -17,6 +17,12 @@ public class AppDbContext : DbContext
     public DbSet<SearchHistory> SearchHistory => Set<SearchHistory>();
     public DbSet<SystemLog> SystemLogs => Set<SystemLog>();
 
+    // Knowledge Base Context
+    public DbSet<QuranAyah> QuranAyahs => Set<QuranAyah>();
+    public DbSet<QuranSurah> QuranSurahs => Set<QuranSurah>();
+    public DbSet<Hadith> Hadiths => Set<Hadith>();
+    public DbSet<HadithCollection> HadithCollections => Set<HadithCollection>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -95,6 +101,39 @@ public class AppDbContext : DbContext
             e.HasKey(l => l.Id);
             e.HasIndex(l => l.Level);
             e.HasIndex(l => l.CreatedAt);
+        });
+
+        // QuranAyah
+        modelBuilder.Entity<QuranAyah>(e =>
+        {
+            e.ToTable("quran_ayahs");
+            e.HasKey(a => a.Id);
+        });
+
+        // QuranSurah
+        modelBuilder.Entity<QuranSurah>(e =>
+        {
+            e.ToTable("quran_surahs");
+            e.HasKey(s => s.Id);
+            e.HasIndex(s => s.SurahNumber).IsUnique();
+        });
+
+        // HadithCollection
+        modelBuilder.Entity<HadithCollection>(e =>
+        {
+            e.ToTable("hadith_collections");
+            e.HasKey(h => h.Id);
+            e.HasIndex(h => h.Name).IsUnique();
+        });
+
+        // Hadith
+        modelBuilder.Entity<Hadith>(e =>
+        {
+            e.ToTable("hadiths");
+            e.HasKey(h => h.Id);
+            e.HasOne(h => h.Collection)
+             .WithMany()
+             .HasForeignKey(h => h.CollectionId);
         });
     }
 }

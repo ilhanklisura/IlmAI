@@ -97,7 +97,7 @@
                   <button 
                     @click="handleResetPassword(user)"
                     class="p-2 rounded-xl text-amber-500 hover:bg-amber-500/10 transition-all"
-                    title="Resetuj lozinku"
+                    :title="$t('admin.users.resetPasswordTooltip')"
                   >
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
                   </button>
@@ -112,7 +112,7 @@
               </td>
             </tr>
             <tr v-else>
-              <td colspan="5" class="px-6 py-12 text-center text-muted italic">Nisu pronađeni korisnici koji odgovaraju pretrazi.</td>
+              <td colspan="5" class="px-6 py-12 text-center text-muted italic">{{ $t('admin.users.noUsersFound') }}</td>
             </tr>
           </tbody>
         </table>
@@ -127,8 +127,8 @@
           <div class="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 mx-auto mb-6">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
           </div>
-          <h3 class="text-xl font-bold text-main text-center mb-2">Lozinka Resetovana</h3>
-          <p class="text-xs text-muted text-center mb-6">Privremena lozinka za korisnika <span class="text-main font-bold">{{ resetPasswordData.username }}</span> je:</p>
+          <h3 class="text-xl font-bold text-main text-center mb-2">{{ $t('admin.users.passwordResetSuccess') }}</h3>
+          <p class="text-xs text-muted text-center mb-6">{{ $t('admin.users.tempPasswordFor') }} <span class="text-main font-bold">{{ resetPasswordData.username }}</span> {{ $t('admin.users.is') }}</p>
           
           <div class="bg-surface-light border border-border/50 p-4 rounded-2xl mb-8 flex items-center justify-between group">
             <code class="text-xl font-black text-emerald-500 tracking-wider">{{ resetPasswordData.newPassword }}</code>
@@ -138,7 +138,7 @@
           </div>
 
           <button @click="resetPasswordData = null" class="w-full py-4 bg-emerald-500 text-white font-bold rounded-2xl hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20">
-            Zatvori
+            {{ $t('common.close') }}
           </button>
         </div>
       </div>
@@ -150,17 +150,17 @@
           <div class="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500 mx-auto mb-6">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
           </div>
-          <h3 class="text-xl font-bold text-main text-center mb-2">Siguran reset?</h3>
+          <h3 class="text-xl font-bold text-main text-center mb-2">{{ $t('admin.users.confirmResetTitle') }}</h3>
           <p class="text-sm text-muted text-center mb-8">
-            Da li ste sigurni da želite resetovati lozinku za korisnika <span class="text-main font-bold">{{ userToReset?.username }}</span>?
+            {{ $t('admin.users.confirmResetDesc') }} <span class="text-main font-bold">{{ userToReset?.username }}</span>?
           </p>
           
           <div class="flex gap-3">
             <button @click="showConfirmReset = false" class="flex-1 py-3 bg-surface border border-border/50 text-muted font-bold rounded-xl hover:bg-border/20 transition-all">
-              Odustani
+              {{ $t('common.cancel') }}
             </button>
             <button @click="confirmResetPassword" class="flex-1 py-3 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/20">
-              Resetuj
+              {{ $t('admin.users.resetBtn') }}
             </button>
           </div>
         </div>
@@ -197,7 +197,7 @@
               @click="showRoleModal = false" 
               class="w-full py-3 text-xs text-muted/60 font-bold hover:text-main transition-colors uppercase tracking-widest pt-4"
             >
-              Odustani
+              {{ $t('common.cancel') }}
             </button>
           </div>
         </div>
@@ -261,7 +261,7 @@ const confirmResetPassword = async () => {
     }
   } catch (err) {
     console.error('Failed to reset password:', err)
-    toast.error('Neuspješan reset lozinke.')
+    toast.error(t('admin.users.resetFailed'))
   } finally {
     showConfirmReset.value = false
     userToReset.value = null
@@ -282,7 +282,7 @@ const confirmChangeRole = async (roleName: string) => {
     toast.success(t('admin.users.roleUpdated'))
   } catch (err: any) {
     console.error('Failed to update role:', err)
-    toast.error(err.message || 'Greška pri promjeni uloge')
+    toast.error(err.message || t('admin.users.roleUpdateFailed'))
   } finally {
     showRoleModal.value = false
     userToEditRole.value = null
@@ -291,7 +291,7 @@ const confirmChangeRole = async (roleName: string) => {
 
 const copyToClipboard = (text: string) => {
   navigator.clipboard.writeText(text)
-  toast.success('Lozinka kopirana!')
+  toast.success(t('admin.users.passwordCopied'))
 }
 
 const filteredUsers = computed(() => {
@@ -340,9 +340,9 @@ const formatLastSeen = (dateStr: string) => {
   const diffMins = Math.floor(diffMs / 60000)
   const diffHours = Math.floor(diffMins / 6000)
   
-  if (diffMins < 1) return 'upravo'
-  if (diffMins < 60) return `${diffMins} min`
-  if (diffHours < 24) return `${diffHours} h`
+  if (diffMins < 1) return t('admin.users.justNow')
+  if (diffMins < 60) return `${diffMins} ${t('admin.users.mins')}`
+  if (diffHours < 24) return `${diffHours} ${t('admin.users.hours')}`
   return formatDate(dateStr)
 }
 

@@ -13,7 +13,7 @@ public class RagController : ControllerBase
     [HttpPost("global")]
     public async Task<IActionResult> AskGlobal([FromBody] RagRequest request, CancellationToken ct)
     {
-        var result = await _ragService.AskGlobalAsync(request.Question, request.Language, ct);
+        var result = await _ragService.AskGlobalAsync(request.Question, request.Language, request.History, ct);
         return Ok(result);
     }
 }

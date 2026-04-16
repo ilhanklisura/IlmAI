@@ -55,9 +55,28 @@ def chunk_quran():
             ayah_start = ayah + 1
 
     conn.commit()
+    conn.commit()
     cur.close()
     conn.close()
     print("Qur'an chunking complete")
+
+
+def chunk_hadith():
+    """Chunk Hadith text for embedding."""
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor()
+
+    cur.execute("SELECT id, collection_id, hadith_number, text_bosnian, text_english FROM hadiths")
+    rows = cur.fetchall()
+
+    for hadith_id, coll_id, h_num, text_bs, text_en in rows:
+        _save_hadith_chunk(cur, coll_id, h_num, text_bs, "bs")
+        _save_hadith_chunk(cur, coll_id, h_num, text_en, "en")
+
+    conn.commit()
+    cur.close()
+    conn.close()
+    print("Hadith chunking complete")
 
 
 def _save_quran_chunk(cur, surah, ayah_start, ayah_end, content, language):
@@ -67,5 +86,15 @@ def _save_quran_chunk(cur, surah, ayah_start, ayah_end, content, language):
     )
 
 
+def _save_hadith_chunk(cur, collection_id, hadith_number, content, language):
+    if not content:
+        return
+    cur.execute(
+        "INSERT INTO hadith_chunks (collection_id, hadith_number, content, language) VALUES (%s, %s, %s, %s)",
+        (collection_id, hadith_number, content, language)
+    )
+
+
 if __name__ == "__main__":
     chunk_quran()
+    chunk_hadith()

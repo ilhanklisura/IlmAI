@@ -26,7 +26,9 @@ const bs = {
   auth: { 
     username: 'Korisničko ime', email: 'Email', password: 'Lozinka', firstName: 'Ime', lastName: 'Prezime', 
     login: 'Prijavi se', register: 'Registruj se', noAccount: 'Nemate račun?', hasAccount: 'Već imate račun?',
-    firstNamePlaceholder: 'Ime', lastNamePlaceholder: 'Prezime'
+    firstNamePlaceholder: 'Ime', lastNamePlaceholder: 'Prezime', confirmPassword: 'Potvrdi šifru',
+    passwordsMismatch: 'Šifre se ne podudaraju', passwordMinLength: 'Min. 6 znakova',
+    passwordStrength: { weak: 'Slaba šifra', medium: 'Srednja šifra', strong: 'Jaka šifra' }
   },
   settings: { title: 'Postavke', theme: 'Tema', language: 'Jezik', notifications: 'Notifikacije', dark: 'Tamna', light: 'Svijetla', save: 'Spremi', changePassword: 'Promijeni lozinku', currentPassword: 'Trenutna lozinka', newPassword: 'Nova lozinka', confirmPassword: 'Potvrdi novu lozinku', passwordChanged: 'Lozinka uspješno promijenjena!', passwordChangeBtn: 'Promijeni lozinku' },
   search: { 
@@ -54,7 +56,7 @@ const bs = {
     error: 'Neispravan kod. Pokušajte ponovo.',
     backToLogin: 'Povratak na prijavu'
   },
-  common: { save: 'Spremi', close: 'Zatvori', backToHome: 'Nazad na početnu' },
+  common: { save: 'Spremi', close: 'Zatvori', backToHome: 'Nazad na početnu', cancel: 'Odustani' },
   admin: {
     nav: { 
       dashboard: 'Dashboard', 
@@ -123,7 +125,21 @@ const bs = {
       lastSeen: 'Viđen',
       verified: 'Verifikovan',
       unverified: 'Nije verifikovan',
-      actions: 'Akcije'
+      actions: 'Akcije',
+      resetPasswordTooltip: 'Resetuj lozinku',
+      passwordResetSuccess: 'Lozinka resetovana',
+      tempPasswordFor: 'Privremena lozinka za korisnika',
+      is: 'je:',
+      confirmResetTitle: 'Siguran reset?',
+      confirmResetDesc: 'Da li ste sigurni da želite resetovati lozinku za korisnika',
+      resetBtn: 'Resetuj',
+      noUsersFound: 'Nisu pronađeni korisnici koji odgovaraju pretrazi.',
+      resetFailed: 'Neuspješan reset lozinke.',
+      roleUpdateFailed: 'Greška pri promjeni uloge',
+      passwordCopied: 'Lozinka kopirana!',
+      justNow: 'upravo',
+      mins: 'min',
+      hours: 'h'
     }
   }
 }
@@ -154,7 +170,9 @@ const en = {
   auth: { 
     username: 'Username', email: 'Email', password: 'Password', firstName: 'First Name', lastName: 'Last Name', 
     login: 'Login', register: 'Register', noAccount: "Don't have an account?", hasAccount: 'Already have an account?',
-    firstNamePlaceholder: 'First Name', lastNamePlaceholder: 'Last Name'
+    firstNamePlaceholder: 'First Name', lastNamePlaceholder: 'Last Name', confirmPassword: 'Confirm password',
+    passwordsMismatch: 'Passwords do not match', passwordMinLength: 'Min. 6 characters',
+    passwordStrength: { weak: 'Weak password', medium: 'Medium password', strong: 'Strong password' }
   },
   settings: { title: 'Settings', theme: 'Theme', language: 'Language', notifications: 'Notifications', dark: 'Dark', light: 'Light', save: 'Save', changePassword: 'Change password', currentPassword: 'Current password', newPassword: 'New password', confirmPassword: 'Confirm new password', passwordChanged: 'Password successfully changed!', passwordChangeBtn: 'Change password' },
   search: { 
@@ -182,7 +200,7 @@ const en = {
     error: 'Invalid code. Please try again.',
     backToLogin: 'Back to Login'
   },
-  common: { save: 'Save', close: 'Close', backToHome: 'Back to Home' },
+  common: { save: 'Save', close: 'Close', backToHome: 'Back to Home', cancel: 'Cancel' },
   admin: {
     nav: { 
       dashboard: 'Dashboard', 
@@ -251,7 +269,21 @@ const en = {
       lastSeen: 'Seen',
       verified: 'Verified',
       unverified: 'Not verified',
-      actions: 'Actions'
+      actions: 'Actions',
+      resetPasswordTooltip: 'Reset password',
+      passwordResetSuccess: 'Password Reset Successful',
+      tempPasswordFor: 'Temporary password for user',
+      is: 'is:',
+      confirmResetTitle: 'Secure reset?',
+      confirmResetDesc: 'Are you sure you want to reset password for user',
+      resetBtn: 'Reset',
+      noUsersFound: 'No users matching the search were found.',
+      resetFailed: 'Password reset failed.',
+      roleUpdateFailed: 'Error changing role',
+      passwordCopied: 'Password copied!',
+      justNow: 'just now',
+      mins: 'min',
+      hours: 'h'
     }
   }
 }

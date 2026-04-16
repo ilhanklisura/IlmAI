@@ -55,17 +55,17 @@
                 </div>
                 <div class="flex justify-between items-center text-[10px] uppercase tracking-widest font-black">
                   <span :class="strength === 1 ? 'text-red-500' : strength === 2 ? 'text-amber-500' : 'text-emerald-500'">
-                    {{ strength === 1 ? 'Slaba' : strength === 2 ? 'Srednja' : 'Jaka' }} Šifra
+                    {{ strength === 1 ? $t('auth.passwordStrength.weak') : strength === 2 ? $t('auth.passwordStrength.medium') : $t('auth.passwordStrength.strong') }}
                   </span>
-                  <span class="text-muted/60" v-if="form.password.length < 6">Min. 6 znakova</span>
+                  <span class="text-muted/60" v-if="form.password.length < 6">{{ $t('auth.passwordMinLength') }}</span>
                 </div>
               </div>
             </div>
 
             <div class="space-y-2">
-              <label class="text-sm font-semibold text-muted tracking-wide ml-1 uppercase text-[11px]">Potvrdi Šifru</label>
+              <label class="text-sm font-semibold text-muted tracking-wide ml-1 uppercase text-[11px]">{{ $t('auth.confirmPassword') }}</label>
               <Input v-model="form.passwordConfirm" type="password" required />
-              <p v-if="passwordsMismatch" class="text-[10px] text-red-500 font-bold uppercase tracking-wider ml-1">Šifre se ne podudaraju</p>
+              <p v-if="passwordsMismatch" class="text-[10px] text-red-500 font-bold uppercase tracking-wider ml-1">{{ $t('auth.passwordsMismatch') }}</p>
             </div>
           </div>
 
@@ -116,7 +116,8 @@ const form = ref({
   password: '',
   passwordConfirm: '',
   firstName: '',
-  lastName: ''
+  lastName: '',
+  preferredLanguage: localStorage.getItem('user-locale') || 'bs'
 })
 
 const strength = computed(() => {

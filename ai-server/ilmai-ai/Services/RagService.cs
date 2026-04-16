@@ -1,9 +1,10 @@
 namespace IlmAI.AI.Services;
+using IlmAI.AI.Models.Request;
 using IlmAI.AI.Models.Response;
 
 public interface IRagService : IService
 {
-    Task<RagResponseDto> AskGlobalAsync(string question, string language, CancellationToken ct = default);
+    Task<RagResponseDto> AskGlobalAsync(string question, string language, List<ChatHistoryItem>? history = null, CancellationToken ct = default);
 }
 
 public class RagService : IRagService
@@ -26,12 +27,12 @@ public class RagService : IRagService
         _chat = chat; _promptBuilder = promptBuilder; _logger = logger;
     }
 
-    public async Task<RagResponseDto> AskGlobalAsync(string question, string language, CancellationToken ct = default)
+    public async Task<RagResponseDto> AskGlobalAsync(string question, string language, List<ChatHistoryItem>? history = null, CancellationToken ct = default)
     {
         language = LanguageDetector.Detect(question, language);
         var queryEmbedding = await _embedding.GetEmbeddingAsync(question, ct);
 
-        var sources = await _retrieval.RetrieveAsync(queryEmbedding, TopK, ScoreThresholdWeak, language, ct);
+        var sources = await _retrieval.RetrieveAsync(question, queryEmbedding, TopK, ScoreThresholdWeak, language, ct);
         
         var topScore = sources.Count > 0 ? sources.Max(s => s.Score) : 0;
         var strongChunks = sources.Where(s => s.Score >= ScoreThresholdStrong).ToList();
@@ -47,7 +48,7 @@ public class RagService : IRagService
         if (contextText.Length > MaxContextLength)
             contextText = contextText[..MaxContextLength];
 
-        var prompt = _promptBuilder.BuildRagPrompt(question, contextText, language);
+        var prompt = _promptBuilder.BuildRagPrompt(question, contextText, language, history);
         var answer = await _chat.CompleteAsync(prompt, ct);
 
         var lowConfidence = topScore < 0.85;

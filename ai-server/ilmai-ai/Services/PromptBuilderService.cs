@@ -2,7 +2,7 @@ namespace IlmAI.AI.Services;
 
 public interface IPromptBuilderService : IService 
 { 
-    string BuildRagPrompt(string question, string context, string language); 
+    string BuildRagPrompt(string question, string context, string language, List<Models.Request.ChatHistoryItem>? history = null); 
     string BuildTitlePrompt(string question, string language);
 }
 public class PromptBuilderService : IPromptBuilderService
@@ -18,11 +18,19 @@ public class PromptBuilderService : IPromptBuilderService
             """;
     }
 
-    public string BuildRagPrompt(string question, string context, string language)
+    public string BuildRagPrompt(string question, string context, string language, List<Models.Request.ChatHistoryItem>? history = null)
     {
         var langInstruction = language == "bs"
             ? "Odgovaraj na bosanskom jeziku."
             : "Answer in English.";
+            
+        var historyText = "";
+        if (history != null && history.Count > 0)
+        {
+            var formattedHistory = history.Select(h => $"{h.Role.ToUpper()}: {h.Content}");
+            historyText = "\n\nPRETHODNA HISTORIJA RAZGOVORA (Koristi ovo samo da shvatiš kontekst pitanja, ako se pitanje oslanja na raniju priču, inače drži se najnovijeg pitanja!):\n" +
+                          string.Join("\n", formattedHistory);
+        }
 
         return $"""
             Ti si IlmAI - vrhunski, stručni i autoritativni AI asistent za islamsko znanje.
@@ -38,17 +46,18 @@ public class PromptBuilderService : IPromptBuilderService
 
             PRAVILA ZA CITIRANJE (KRITIČNO):
             6. STRIKTNOST CITATA: Kur'anski ajeti se MORAJU citirati DOSLOVNO. Nikada nemoj parafrazirati ili mijenjati ijednu riječ u ajetu. Ako citiraš ajet iz dostavljenog "KONTEKSTA", prenesi ga tačno onako kako piše.
-            7. IZVORI: Uvijek navedi precizan izvor (npr. "Kur'an, sura El-Bekare, ajet 286" ili "Buhari, hadis 1234").
-            8. PRECIZNOST: Pažljivo čitaj pitanje. Naprimjer, ako korisnik pita za Bismillah 'unutar' ili 'usred' sure, obrati pažnju na suru En-Neml (27:30) gdje se Bismillah nalazi unutar teksta kao dio ajeta, a ne samo na početku.
+            7. IZVORI: Uvijek navedi precizan izvor. Bilo da odgovaraš na osnovu Kur'ana ili Hadisa koje vidiš u kontekstu, ZABRANJENO je miješati ih!
+            8. CITIRANJE HADISA: Ako je izvor iz konteksta Hadis (npr. iz Sahih Bukhari), strogo na kraju odgovora ili unutar teksta napiši kolekciju i broj (npr. "Sahih al-Bukhari, Hadis 1234"). NIKADA nemoj reći da je to Kur'an.
+            9. ZABRANA HALUCINIRANJA: Moguće je da će biti zatražen hadis. Ako KONTEKST ispod NE SADRŽI nikakve hadise, strogo je zabranjeno da izmišljaš hadise iz svoje globalne historije i memorije (tzv. hallucination). Smiješ citirati samo one izvore (ajete, hadise) Koji se eksplicitno nalaze ispisani ispod u rubrici KONTEKST! Ako nema, reci da nemaš informacije u svojoj bazi.
 
             GENERALNA PRAVILA:
             9. BEZ IZGOVORA: Nemoj govoriti da "nisi stručnjak" ili da korisnik treba "pitati lokalnog imama". TI SI TAJ STRUČNJAK ovdje. Pruži odlučan odgovor.
             10. ISKLJUČIVA TEMA: Tvoja oblast je ISKLJUČIVO ISLAM. Odbij razgovor o bilo čemu drugom na ljubazan način.
 
             KONTEKST:
-            {context}
+            {context}{historyText}
 
-            PITANJE:
+            NAJNOVIJE PITANJE:
             {question}
             """;
     }

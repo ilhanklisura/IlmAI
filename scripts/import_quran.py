@@ -20,6 +20,7 @@ def import_quran():
 
     current_surah = None
     english_translation = {}
+    arabic_translation = {}
 
     with open(BOSNIAN_CSV, "r", encoding="utf-8") as f:
         # First 11 lines are headers/comments, let's skip until we hit 'id,sura,aya'
@@ -40,6 +41,7 @@ def import_quran():
             
             if sura != current_surah:
                 current_surah = sura
+                
                 # Load english translation
                 en_file = os.path.join(ENGLISH_DIR, f"en_translation_{sura}.json")
                 if os.path.exists(en_file):
@@ -47,21 +49,31 @@ def import_quran():
                         en_data = json.load(enf)
                         english_translation = en_data.get("verse", {})
                 else:
-                    print(f"Warning: English translation file for surah {sura} not found.")
                     english_translation = {}
+
+                # Load arabic text
+                ar_file = os.path.join(DATASETS_DIR, "quranjson-master", "source", "surah", f"surah_{sura}.json")
+                if os.path.exists(ar_file):
+                    with open(ar_file, "r", encoding="utf-8") as arf:
+                        ar_data = json.load(arf)
+                        arabic_translation = ar_data.get("verse", {})
+                else:
+                    arabic_translation = {}
             
             verse_key = f"verse_{aya}"
             text_en = english_translation.get(verse_key, "")
+            text_ar = arabic_translation.get(verse_key, "")
 
             cur.execute(
                 """
-                INSERT INTO quran_ayahs (surah_number, ayah_number, text_bosnian, text_english)
-                VALUES (%s, %s, %s, %s)
+                INSERT INTO quran_ayahs (surah_number, ayah_number, text_arabic, text_bosnian, text_english)
+                VALUES (%s, %s, %s, %s, %s)
                 ON CONFLICT (surah_number, ayah_number) DO UPDATE SET
+                    text_arabic = EXCLUDED.text_arabic,
                     text_bosnian = EXCLUDED.text_bosnian,
                     text_english = EXCLUDED.text_english
                 """,
-                (sura, aya, text_bs, text_en),
+                (sura, aya, text_ar, text_bs, text_en),
             )
 
     conn.commit()

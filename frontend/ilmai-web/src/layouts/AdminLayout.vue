@@ -3,7 +3,7 @@
     <!-- Sidebar -->
     <aside class="w-72 bg-surface border-r border-border/50 flex flex-col fixed inset-y-0 z-50">
       <div class="p-6">
-        <router-link to="/" class="flex items-center space-x-3 group">
+        <router-link to="/admin" class="flex items-center space-x-3 group">
           <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
             <svg class="w-6 h-6 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z" />
@@ -34,12 +34,19 @@
       </nav>
 
       <div class="p-6 border-t border-border/50">
-        <router-link to="/" class="flex items-center space-x-3 px-4 py-3 rounded-xl font-bold text-xs text-muted hover:bg-red-500/10 hover:text-red-500 transition-all">
+        <router-link to="/" class="flex items-center space-x-3 px-4 py-3 rounded-xl font-bold text-xs text-muted hover:bg-emerald-500/10 hover:text-emerald-500 transition-all mb-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
           <span>{{ $t('common.backToHome') }}</span>
         </router-link>
+        
+        <button @click="auth.logout()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-bold text-xs text-muted hover:bg-red-500/10 hover:text-red-500 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>{{ $t('nav.logout') }}</span>
+        </button>
       </div>
     </aside>
 

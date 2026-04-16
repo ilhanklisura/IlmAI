@@ -41,7 +41,7 @@ public class SearchService : ISearchService
     {
         language = LanguageDetector.Detect(question, language);
         var embedding = await _embedding.GetEmbeddingAsync(question, ct);
-        return await _retrieval.RetrieveAsync(embedding, topK, 0.40, language, ct);
+        return await _retrieval.RetrieveAsync(question, embedding, topK, 0.40, language, ct);
     }
 }
 

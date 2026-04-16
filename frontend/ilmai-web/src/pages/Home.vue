@@ -58,12 +58,18 @@
               
               <!-- FIX: stabilno centriranje -->
               <div class="flex flex-col items-center text-center px-6 space-y-3">
-                <p class="text-3xl md:text-4xl font-serif text-emerald-500/80 leading-normal dir-rtl" v-if="dailyData.ayah.textArabic">
+                <p 
+                  class="font-serif text-emerald-500/80 leading-normal dir-rtl" 
+                  :class="[dailyData.ayah.textArabic.length > 200 ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl']"
+                  v-if="dailyData.ayah.textArabic">
                   {{ dailyData.ayah.textArabic }}
                 </p>
 
-                <div class="space-y-1">
-                  <p class="text-lg md:text-xl font-sans font-semibold text-main leading-relaxed" style="font-family: var(--font-sans) !important;">
+                <div class="space-y-1 w-full max-h-[200px] overflow-y-auto custom-scrollbar px-2">
+                  <p 
+                    class="font-sans font-semibold text-main leading-relaxed" 
+                    :class="[dailyData.ayah.textTranslation.length > 300 ? 'text-md md:text-lg' : 'text-lg md:text-xl']"
+                    style="font-family: var(--font-sans) !important;">
                     "{{ dailyData.ayah.textTranslation }}"
                   </p>
                 </div>
@@ -102,12 +108,18 @@
               
               <!-- FIX: centriranje -->
               <div class="flex-grow flex flex-col justify-center items-center text-center px-6 space-y-4">
-                <p class="text-3xl md:text-4xl font-serif text-emerald-500/80 leading-normal dir-rtl" v-if="dailyData.hadith.textArabic">
+                <p 
+                  class="font-serif text-emerald-500/80 leading-normal dir-rtl" 
+                  :class="[dailyData.hadith.textArabic.length > 200 ? 'text-2xl md:text-3xl' : 'text-3xl md:text-4xl']"
+                  v-if="dailyData.hadith.textArabic">
                   {{ dailyData.hadith.textArabic }}
                 </p>
 
-                <div class="space-y-1">
-                  <p class="text-lg md:text-xl font-sans font-semibold text-main leading-relaxed" style="font-family: var(--font-sans) !important;">
+                <div class="space-y-1 w-full max-h-[200px] overflow-y-auto custom-scrollbar px-2">
+                  <p 
+                    class="font-sans font-semibold text-main leading-relaxed" 
+                    :class="[dailyData.hadith.textTranslation.length > 300 ? 'text-md md:text-lg' : 'text-lg md:text-xl']"
+                    style="font-family: var(--font-sans) !important;">
                     "{{ dailyData.hadith.textTranslation }}"
                   </p>
                 </div>
