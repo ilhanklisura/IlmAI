@@ -34,7 +34,19 @@ public class SettingsService : ISettingsService
         }
 
         if (request.Theme != null) settings.Theme = request.Theme;
-        if (request.Language != null) settings.Language = request.Language;
+        if (request.Language != null) 
+        {
+            settings.Language = request.Language;
+            
+            // Sync with the main User entity's PreferredLanguage field
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                user.PreferredLanguage = request.Language;
+                user.UpdatedAt = DateTime.UtcNow;
+            }
+        }
+        
         if (request.NotificationsEnabled.HasValue) settings.NotificationsEnabled = request.NotificationsEnabled.Value;
         settings.UpdatedAt = DateTime.UtcNow;
 

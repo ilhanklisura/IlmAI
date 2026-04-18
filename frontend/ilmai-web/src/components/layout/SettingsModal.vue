@@ -186,10 +186,18 @@ const updateTheme = () => {
   document.body.style.backgroundColor = isLight ? '#f8fafc' : '#0f172a'
 }
 
-const setLanguage = (lang: string) => {
+const setLanguage = async (lang: string) => {
   currentLang.value = lang
   locale.value = lang
   localStorage.setItem('user-locale', lang)
+  
+  if (auth.isAuthenticated) {
+    try {
+      await api.settings.update({ language: lang })
+    } catch (err) {
+      console.error('Failed to sync language to backend:', err)
+    }
+  }
 }
 
 const handleChangePassword = async () => {

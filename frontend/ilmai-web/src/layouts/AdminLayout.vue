@@ -164,10 +164,18 @@ const updateTheme = () => {
   document.body.style.backgroundColor = isLight ? '#f8fafc' : '#0f172a'
 }
 
-const toggleLanguage = () => {
+const toggleLanguage = async () => {
   const newLang = locale.value === 'bs' ? 'en' : 'bs'
   locale.value = newLang
   localStorage.setItem('user-locale', newLang)
+  
+  if (auth.isAuthenticated) {
+    try {
+      await api.settings.update({ language: newLang })
+    } catch (err) {
+      console.error('Failed to sync language to backend:', err)
+    }
+  }
 }
 
 onMounted(() => {
